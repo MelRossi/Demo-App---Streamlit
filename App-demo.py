@@ -17,6 +17,22 @@ from sklearn.metrics import (
     roc_curve
 )
 
+st.markdown(
+    """
+    <style>
+    .logo-container {
+        display: flex;
+        justify-content: flex-end;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+col1, col2 = st.columns([8, 2])
+with col2:
+    st.image("Logo.png", width=180)
+
 # Funciones utilitarias
 def cargar_datos(uploaded_file):
     try:
@@ -52,8 +68,8 @@ def mostrar_grafico(data, column_x, column_y, plot_type):
     plt.clf()
 
 # Configuración de la app
-st.title("Modelo Predictivo Clínico")
-st.write("Cargar datos, entrenar un modelo y predecir la respuesta clínica.")
+st.markdown('<h1 style="color:#EA7072;">NeuroData Lab</h1>', unsafe_allow_html=True)
+st.write("Modelo Predictivo Clínico")
 
 # Paso 1: Carga de datos
 st.header("1. Cargar Datos")
