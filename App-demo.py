@@ -71,7 +71,7 @@ def mostrar_grafico(data, column_x, column_y, plot_type):
 st.markdown("""
     <style>
     .gradient-text {
-        font-size: 48px; /* Aumentado el tamaño del título */
+        font-size: 52px; /* Aumentado el tamaño del título */
         font-weight: bold;
         background: linear-gradient(to right, #776BDC, #EA937F);
         -webkit-background-clip: text;
@@ -79,7 +79,7 @@ st.markdown("""
         text-align: center;
     }
     .subtitle {
-        font-size: 24px; /* Tamaño del subtítulo */
+        font-size: 18px; /* Tamaño del subtítulo */
         font-weight: bold;
         color: #555; /* Color gris oscuro */
         text-align: center;
