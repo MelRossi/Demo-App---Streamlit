@@ -97,27 +97,25 @@ st.write("## <span style='color: #EA937F;'>1. Cargar Datos</span>", unsafe_allow
 uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
 
 if uploaded_file:
-    data = pd.read_csv(uploaded_file, encoding='latin-1')
-    st.write("Vista previa de los datos cargados:")
-    st.dataframe(data.head())
-else:
-    st.warning("Por favor, sube un archivo CSV para continuar.")
-    st.stop()
+    data = cargar_datos(uploaded_file)
+    if data is not None:
+        st.write("Vista previa de los datos cargados:")
+        st.dataframe(data.head())
 
-# Comparación Gráfica
-st.write("## <span style='color: #EA937F; font-size: 24px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
-st.write("Selecciona dos columnas para comparar y el tipo de gráfico a visualizar:")
+        # Comparación Gráfica
+        st.write("## <span style='color: #EA937F; font-size: 24px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
+        st.write("Selecciona dos columnas para comparar y el tipo de gráfico a visualizar:")
 
-col1, col2 = st.columns(2)
-with col1:
-    column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
-with col2:
-    column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
+        col1, col2 = st.columns(2)
+        with col1:
+            column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
+        with col2:
+            column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
 
-plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
+        plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
 
-if column_x and column_y:
-    mostrar_grafico(data, column_x, column_y, plot_type)
+        if column_x and column_y:
+            mostrar_grafico(data, column_x, column_y, plot_type)
 
     # Generar conclusiones basadas en el tipo de gráfico
     st.write("## <span style='color: #EA937F;'>Conclusión</span>", unsafe_allow_html=True)
