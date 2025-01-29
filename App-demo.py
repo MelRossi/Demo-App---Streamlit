@@ -83,7 +83,7 @@ st.markdown("""
         font-weight: bold;
         color: #555; /* Color gris oscuro */
         text-align: center;
-        margin-top: -6px; /* Ajuste de margen para acercarlo al título */
+        margin-top: -4px; /* Ajuste de margen para acercarlo al título */
     }
     </style>
     <h1 class="gradient-text">NeuroData Lab</h1>
