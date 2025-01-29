@@ -68,7 +68,7 @@ def mostrar_grafico(data, column_x, column_y, plot_type):
     plt.clf()
 
 # Configuración de la app
-st.markdown('<h1 style="color:#EA7072;">NeuroData Lab</h1>', unsafe_allow_html=True)
+st.markdown('<h1 style="color:#776BDC;">NeuroData Lab</h1>', unsafe_allow_html=True)
 st.write("Modelo Predictivo Clínico")
 
 # Paso 1: Carga de datos
@@ -175,13 +175,13 @@ if uploaded_file:
             st.text("Reporte de Clasificación:")
             st.text(classification_report(y_test, y_pred))
 
-            st.header("4. Predicción")
+            st.write("## <span style='color: #EA937F;'>4. Predicción</span>", unsafe_allow_html=True)
             predict_file = st.file_uploader("Archivo de predicción (CSV):", type=["csv"], key="predict")
 
             if predict_file:
                 predict_data = cargar_datos(predict_file)
                 if predict_data is not None:
-                    st.write("Datos cargados para predicción:")
+                    st.write("## <span style='color: #EA937F;'>Datos cargados para predicción:</span>", unsafe_allow_html=True)
                     st.dataframe(predict_data.head())
 
                     predict_data = pd.get_dummies(predict_data, drop_first=True)
@@ -190,7 +190,7 @@ if uploaded_file:
                     predictions = modelo.predict(predict_data)
                     probabilities = modelo.predict_proba(predict_data)
 
-                    st.write("**Resultados de las predicciones:**")
+                    st.write("## <span style='color: #EA937F;'>**Resultados de las predicciones:**</span>", unsafe_allow_html=True)
                     result_df = predict_data.copy()
                     result_df["Predicción"] = predictions
                     result_df["Probabilidad"] = probabilities.max(axis=1)
