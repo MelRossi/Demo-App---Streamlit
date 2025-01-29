@@ -72,7 +72,7 @@ st.markdown('<h1 style="color:#EA7072;">NeuroData Lab</h1>', unsafe_allow_html=T
 st.write("Modelo Predictivo Clínico")
 
 # Paso 1: Carga de datos
-st.header("1. Cargar Datos")
+st.write("## <span style='color: #EA937F;'>1. Cargar Datos</span>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
 
 if uploaded_file:
@@ -82,7 +82,7 @@ if uploaded_file:
         st.dataframe(data.head())
 
         # Comparación Gráfica
-        st.header("Comparación Gráfica")
+        st.write("## <span style='color: #EA937F;'>Comparación Gráfica</span>", unsafe_allow_html=True)
         st.write("Selecciona dos columnas para comparar y el tipo de gráfico a visualizar:")
 
         col1, col2 = st.columns(2)
@@ -97,7 +97,7 @@ if uploaded_file:
             mostrar_grafico(data, column_x, column_y, plot_type)
 
         # Selección de la variable objetivo
-        st.write("## <span style='color: #EA9698;'>2. Selección de Columnas</span>", unsafe_allow_html=True)
+        st.write("## <span style='color: #EA937F;'>2. Selección de Columnas</span>", unsafe_allow_html=True)
         target_col = st.selectbox(
             "Variable objetivo (Y):",
             data.columns,
@@ -106,7 +106,7 @@ if uploaded_file:
         feature_cols = st.multiselect("Selecciona las características (X):", [col for col in data.columns if col != target_col])
 
         if target_col and feature_cols:
-            st.header("3. Entrenamiento del Modelo")
+            st.write("## <span style='color: #EA937F;'>3. Entrenamiento del Modelo</span>", unsafe_allow_html=True)
             X = data[feature_cols]
             y = data[target_col]
 
@@ -130,7 +130,7 @@ if uploaded_file:
             best_params_dt = realizar_grid_search(DecisionTreeClassifier(random_state=42), param_grid_dt, X_train_res, y_train_res)
             best_params_rf = realizar_grid_search(RandomForestClassifier(random_state=42), param_grid_rf, X_train_res, y_train_res)
 
-            st.write("Selecciona el modelo de aprendizaje:")
+            st.write("## <span style='color: #EA937F;'>Selecciona el modelo de aprendizaje:</span>", unsafe_allow_html=True)
             model_choice = st.selectbox("Modelo:", ["Logistic Regression", "Decision Tree", "Random Forest"])
 
             if model_choice == "Logistic Regression":
