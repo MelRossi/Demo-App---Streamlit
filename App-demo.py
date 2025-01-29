@@ -251,13 +251,12 @@ if target_col and feature_cols:
             result_df["Probabilidad"] = probabilities.max(axis=1)
             st.dataframe(result_df)
 
-            #Crear gráfico
+           # Crear histograma de probabilidades
             fig, ax = plt.subplots()
-            result_df["Predicción"].value_counts().plot(kind="bar", ax=ax, color="#08306B")
-            ax.set_title("Distribución de Predicciones")
-            ax.set_xlabel("Clase Predicha")
+            sns.histplot(result_df["Probabilidad"], bins=10, kde=True, color="#4292C6", ax=ax)
+            ax.set_title("Distribución de Probabilidades de Predicción")
+            ax.set_xlabel("Probabilidad máxima asignada")
             ax.set_ylabel("Frecuencia")
-
             st.pyplot(fig)
 
             st.download_button(
