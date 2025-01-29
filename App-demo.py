@@ -192,6 +192,15 @@ if uploaded_file:
                     result_df["Probabilidad"] = probabilities.max(axis=1)
                     st.dataframe(result_df)
 
+                    #Crear gráfico
+                    fig, ax = plt.subplots()
+                    result_df["Predicción"].value_counts().plot(kind="bar", ax=ax, color="#776BDC")
+                    ax.set_title("Distribución de Predicciones")
+                    ax.set_xlabel("Clase Predicha")
+                    ax.set_ylabel("Frecuencia")
+
+                    st.pyplot(fig)
+
                     st.download_button(
                         label="Descargar resultados",
                         data=result_df.to_csv(index=False).encode('utf-8'),
