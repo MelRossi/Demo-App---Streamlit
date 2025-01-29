@@ -98,7 +98,11 @@ if uploaded_file:
 
         # Selección de la variable objetivo
         st.header("2. Selección de Columnas")
-        target_col = st.selectbox("Selecciona la variable objetivo (Y):", data.columns)
+        target_col = st.selectbox(
+            "Selecciona la variable objetivo (Y):",
+            data.columns,
+            index=data.columns.get_loc("RESPUESTA_BINARIA") if "RESPUESTA_BINARIA" in data.columns else 0
+        )
         feature_cols = st.multiselect("Selecciona las características (X):", [col for col in data.columns if col != target_col])
 
         if target_col and feature_cols:
