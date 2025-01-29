@@ -97,9 +97,9 @@ if uploaded_file:
             mostrar_grafico(data, column_x, column_y, plot_type)
 
         # Selección de la variable objetivo
-        st.header("2. Selección de Columnas")
+        st.write("## <span style='color: #EA9698;'>2. Selección de Columnas</span>", unsafe_allow_html=True)
         target_col = st.selectbox(
-            "Selecciona la variable objetivo (Y):",
+            "Variable objetivo (Y):",
             data.columns,
             index=data.columns.get_loc("RESPUESTA_BINARIA") if "RESPUESTA_BINARIA" in data.columns else 0
         )
