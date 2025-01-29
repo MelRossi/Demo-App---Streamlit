@@ -193,11 +193,8 @@ if target_col and feature_cols:
 
     modelo.fit(X_train_res, y_train_res)
 
-    # Ajustar threshold manualmente
-    threshold = st.slider("Ajustar el Threshold de Predicción", 0.1, 0.9, 0.5)
-
-    y_prob = modelo.predict_proba(X_test_scaled)[:, 1]
-    y_pred = (y_prob >= threshold).astype(int)  # Se usa el threshold para definir la clasificación
+    y_pred = modelo.predict(X_test_scaled)
+    y_prob = modelo.predict_proba(X_test_scaled)
 
     accuracy = accuracy_score(y_test, y_pred)
     st.write("**Exactitud del modelo:**", accuracy)
@@ -206,10 +203,10 @@ if target_col and feature_cols:
         roc_auc = roc_auc_score(y_test, y_prob, multi_class='ovr')
         st.write("**AUC-ROC (multiclase):**", roc_auc)
     else:
-        roc_auc = roc_auc_score(y_test, y_prob)
+        roc_auc = roc_auc_score(y_test, y_prob[:, 1])
         st.write("**AUC-ROC:**", roc_auc)
 
-        fpr, tpr, _ = roc_curve(y_test, y_prob)
+        fpr, tpr, _ = roc_curve(y_test, y_prob[:, 1])
         plt.figure()
         plt.plot(fpr, tpr, label=f"ROC curve (area = {roc_auc:.2f})")
         plt.plot([0, 1], [0, 1], "k--")
