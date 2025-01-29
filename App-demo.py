@@ -69,12 +69,17 @@ def mostrar_grafico(data, column_x, column_y, plot_type):
 
 # Configuración de la app
 st.markdown("""
-    <h1 style="
+    <style>
+    .gradient-text {
+        font-size: 36px;
+        font-weight: bold;
         background: linear-gradient(to right, #776BDC, #EA937F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 42px;
-    ">NeuroData Lab</h1>
+        text-align: center;
+    }
+    </style>
+    <h1 class="gradient-text">NeuroData Lab</h1>
 """, unsafe_allow_html=True)
 st.write("Modelo Predictivo Clínico")
 
