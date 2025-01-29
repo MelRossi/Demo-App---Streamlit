@@ -68,7 +68,14 @@ def mostrar_grafico(data, column_x, column_y, plot_type):
     plt.clf()
 
 # Configuración de la app
-st.markdown('<h1 style="color:#776BDC;">NeuroData Lab</h1>', unsafe_allow_html=True)
+st.markdown("""
+    <h1 style="
+        background: linear-gradient(to right, #776BDC, #EA937F);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 42px;
+    ">NeuroData Lab</h1>
+""", unsafe_allow_html=True)
 st.write("Modelo Predictivo Clínico")
 
 # Paso 1: Carga de datos
