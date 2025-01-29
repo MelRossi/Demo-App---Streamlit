@@ -107,7 +107,7 @@ if uploaded_file is not None:
         st.error("No se pudieron cargar los datos. Verifica el archivo e intenta nuevamente.")
         st.stop()
 else:
-    st.warning("Por favor, sube un archivo CSV antes de continuar.")
+    st.warning("Por favor, sube un archivo CSV para continuar.")
     st.stop()
 
 # Comparación Gráfica
