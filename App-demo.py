@@ -73,17 +73,17 @@ st.markdown("""
     .gradient-text {
         font-size: 52px; /* Aumentado el tamaño del título */
         font-weight: bold;
-        background: linear-gradient(to right, #776BDC, #EA937F);
+        background: linear-gradient(to right, #776BDC, #EB4D50);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
     }
     .subtitle {
-        font-size: 18px; /* Tamaño del subtítulo */
+        font-size: 10px; /* Tamaño del subtítulo */
         font-weight: bold;
         color: #555; /* Color gris oscuro */
         text-align: center;
-        margin-top: -10px; /* Ajuste de margen para acercarlo al título */
+        margin-top: -6px; /* Ajuste de margen para acercarlo al título */
     }
     </style>
     <h1 class="gradient-text">NeuroData Lab</h1>
