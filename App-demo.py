@@ -118,7 +118,7 @@ if uploaded_file:
             mostrar_grafico(data, column_x, column_y, plot_type)
 
     # Generar conclusiones basadas en el tipo de gráfico
-    st.write("## <span style='color: #EA937F;'>Conclusión</span>", unsafe_allow_html=True)
+    st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
 
     if plot_type == "Scatterplot":
         st.write(f"El gráfico de dispersión entre **{column_x}** y **{column_y}** ayuda a visualizar la relación entre ambas variables. "
@@ -219,7 +219,7 @@ if target_col and feature_cols:
     st.text(classification_report(y_test, y_pred))
            
     # Agregar conclusión basada en los resultados
-    st.write("## <span style='color: #EA937F;'>Conclusión</span>", unsafe_allow_html=True)
+    st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
     st.write("El modelo ha sido entrenado exitosamente y evaluado en los datos de prueba. La exactitud obtenida indica el rendimiento del modelo en la clasificación de los datos. Se recomienda revisar la matriz de confusión y la curva ROC para analizar el comportamiento de las predicciones. Dependiendo del objetivo clínico, se pueden ajustar los hiperparámetros o probar modelos adicionales para mejorar los resultados.")
 
     st.write("## <span style='color: #EA937F;'>4. Predicción</span>", unsafe_allow_html=True)
