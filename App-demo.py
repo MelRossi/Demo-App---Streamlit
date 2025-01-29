@@ -101,20 +101,44 @@ if uploaded_file:
         st.write("Vista previa de los datos cargados:")
         st.dataframe(data.head())
 
-        # Comparación Gráfica
-        st.write("## <span style='color: #EA937F; font-size: 24px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
-        st.write("Selecciona dos columnas para comparar y el tipo de gráfico a visualizar:")
+# Comparación Gráfica
+st.write("## <span style='color: #EA937F; font-size: 24px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
+st.write("Selecciona dos columnas para comparar y el tipo de gráfico a visualizar:")
 
-        col1, col2 = st.columns(2)
-        with col1:
-            column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
-        with col2:
-            column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
+col1, col2 = st.columns(2)
+with col1:
+    column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
+with col2:
+    column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
 
-        plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
+plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
 
-        if column_x and column_y:
-            mostrar_grafico(data, column_x, column_y, plot_type)
+if column_x and column_y:
+    mostrar_grafico(data, column_x, column_y, plot_type)
+
+    # Generar conclusiones basadas en el tipo de gráfico
+    st.write("## <span style='color: #EA937F;'>Conclusión</span>", unsafe_allow_html=True)
+
+    if plot_type == "Scatterplot":
+        st.write(f"El gráfico de dispersión entre **{column_x}** y **{column_y}** ayuda a visualizar la relación entre ambas variables. "
+                 "Si se observa una tendencia clara (ascendente o descendente), podría indicar una correlación significativa. "
+                 "Si los puntos están dispersos sin un patrón, la relación puede ser débil o inexistente.")
+
+    elif plot_type == "Heatmap":
+        st.write(f"El heatmap muestra la distribución conjunta entre **{column_x}** y **{column_y}**. "
+                 "Valores más altos en ciertas áreas indican una mayor concentración de datos. "
+                 "Esto puede ayudar a identificar patrones en la relación entre ambas variables.")
+
+    elif plot_type == "Histograma":
+        st.write(f"Los histogramas permiten analizar la distribución de las variables **{column_x}** y **{column_y}**. "
+                 "Si la forma de la distribución es sesgada o bimodal, esto puede indicar diferencias en la naturaleza de los datos "
+                 "o la presencia de subgrupos dentro de la muestra.")
+
+    elif plot_type == "Boxplot":
+        st.write(f"El boxplot entre **{column_x}** y **{column_y}** permite visualizar la dispersión y presencia de valores atípicos. "
+                 "Si hay una gran cantidad de valores fuera de los bigotes del boxplot, es posible que existan outliers significativos.")
+
+
 
         # Selección de la variable objetivo
         st.write("## <span style='color: #EA937F;'>2. Selección de Columnas</span>", unsafe_allow_html=True)
@@ -194,6 +218,10 @@ if uploaded_file:
 
             st.text("Reporte de Clasificación:")
             st.text(classification_report(y_test, y_pred))
+            
+            # Agregar conclusión basada en los resultados
+            st.write("## <span style='color: #EA937F;'>Conclusión</span>", unsafe_allow_html=True)
+            st.write("El modelo ha sido entrenado exitosamente y evaluado en los datos de prueba. La exactitud obtenida indica el rendimiento del modelo en la clasificación de los datos. Se recomienda revisar la matriz de confusión y la curva ROC para analizar el comportamiento de las predicciones. Dependiendo del objetivo clínico, se pueden ajustar los hiperparámetros o probar modelos adicionales para mejorar los resultados.")
 
             st.write("## <span style='color: #EA937F;'>4. Predicción</span>", unsafe_allow_html=True)
             predict_file = st.file_uploader("Archivo de predicción (CSV):", type=["csv"], key="predict")
