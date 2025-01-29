@@ -82,7 +82,7 @@ if uploaded_file:
         st.dataframe(data.head())
 
         # Comparación Gráfica
-        st.write("## <span style='color: #EA937F; font-size: 18px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
+        st.write("## <span style='color: #EA937F; font-size: 20px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
         st.write("Selecciona dos columnas para comparar y el tipo de gráfico a visualizar:")
 
         col1, col2 = st.columns(2)
@@ -130,7 +130,7 @@ if uploaded_file:
             best_params_dt = realizar_grid_search(DecisionTreeClassifier(random_state=42), param_grid_dt, X_train_res, y_train_res)
             best_params_rf = realizar_grid_search(RandomForestClassifier(random_state=42), param_grid_rf, X_train_res, y_train_res)
 
-            st.write("## <span style='color: #EA937F; font-size: 18px; '>Selecciona el modelo de aprendizaje:</span>", unsafe_allow_html=True)
+            st.write("## <span style='color: #EA937F; font-size: 20px; '>Selecciona el modelo de aprendizaje:</span>", unsafe_allow_html=True)
             model_choice = st.selectbox("Modelo:", ["Logistic Regression", "Decision Tree", "Random Forest"])
 
             if model_choice == "Logistic Regression":
@@ -181,7 +181,7 @@ if uploaded_file:
             if predict_file:
                 predict_data = cargar_datos(predict_file)
                 if predict_data is not None:
-                    st.write("## <span style='color: #EA937F; font-size: 18px; '>Datos cargados para predicción:</span>", unsafe_allow_html=True)
+                    st.write("## <span style='color: #EA937F; font-size: 20px; '>Datos cargados para predicción:</span>", unsafe_allow_html=True)
                     st.dataframe(predict_data.head())
 
                     predict_data = pd.get_dummies(predict_data, drop_first=True)
@@ -190,7 +190,7 @@ if uploaded_file:
                     predictions = modelo.predict(predict_data)
                     probabilities = modelo.predict_proba(predict_data)
 
-                    st.write("## <span style='color: #EA937F; font-size: 18px; '>**Resultados de las predicciones:**</span>", unsafe_allow_html=True)
+                    st.write("## <span style='color: #EA937F; font-size: 20px; '>**Resultados de las predicciones:**</span>", unsafe_allow_html=True)
                     result_df = predict_data.copy()
                     result_df["Predicción"] = predictions
                     result_df["Probabilidad"] = probabilities.max(axis=1)
