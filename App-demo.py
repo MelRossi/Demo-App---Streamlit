@@ -71,17 +71,24 @@ def mostrar_grafico(data, column_x, column_y, plot_type):
 st.markdown("""
     <style>
     .gradient-text {
-        font-size: 36px;
+        font-size: 48px; /* Aumentado el tamaño del título */
         font-weight: bold;
         background: linear-gradient(to right, #776BDC, #EA937F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
     }
+    .subtitle {
+        font-size: 24px; /* Tamaño del subtítulo */
+        font-weight: bold;
+        color: #555; /* Color gris oscuro */
+        text-align: center;
+        margin-top: -10px; /* Ajuste de margen para acercarlo al título */
+    }
     </style>
     <h1 class="gradient-text">NeuroData Lab</h1>
+    <h2 class="subtitle">Modelo Predictivo Clínico</h2>
 """, unsafe_allow_html=True)
-st.write("Modelo Predictivo Clínico")
 
 # Paso 1: Carga de datos
 st.write("## <span style='color: #EA937F;'>1. Cargar Datos</span>", unsafe_allow_html=True)
