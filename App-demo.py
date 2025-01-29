@@ -31,7 +31,7 @@ st.markdown(
 
 col1, col2 = st.columns([8, 2])
 with col2:
-    st.image("Logo.png", width=180) 
+    st.image("Logo.png", width=120) 
 
 # Funciones utilitarias
 def cargar_datos(uploaded_file):
