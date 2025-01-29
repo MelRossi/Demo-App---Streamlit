@@ -96,26 +96,34 @@ st.markdown("""
 st.write("## <span style='color: #EA937F;'>1. Cargar Datos</span>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
 
-if uploaded_file:
+# Validar que el archivo fue cargado antes de continuar
+if uploaded_file is not None:
     data = cargar_datos(uploaded_file)
-    if data is not None:
+
+    if data is not None:  # Verifica que la carga fue exitosa
         st.write("Vista previa de los datos cargados:")
         st.dataframe(data.head())
+    else:
+        st.error("No se pudieron cargar los datos. Verifica el archivo e intenta nuevamente.")
+        st.stop()
+else:
+    st.warning("Por favor, sube un archivo CSV antes de continuar.")
+    st.stop()
 
-        # Comparación Gráfica
-        st.write("## <span style='color: #EA937F; font-size: 24px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
-        st.write("Selecciona dos columnas para comparar y el tipo de gráfico a visualizar:")
+# Comparación Gráfica
+st.write("## <span style='color: #EA937F; font-size: 24px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
+st.write("Selecciona dos columnas para comparar y el tipo de gráfico a visualizar:")
 
-        col1, col2 = st.columns(2)
-        with col1:
-            column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
-        with col2:
-            column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
+col1, col2 = st.columns(2)
+with col1:
+    column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
+with col2:
+    column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
 
-        plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
+plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
 
-        if column_x and column_y:
-            mostrar_grafico(data, column_x, column_y, plot_type)
+if column_x and column_y:
+    mostrar_grafico(data, column_x, column_y, plot_type)
 
     # Generar conclusiones basadas en el tipo de gráfico
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
