@@ -17,22 +17,6 @@ from sklearn.metrics import (
     roc_curve
 )
 
-st.markdown(
-    """
-    <style>
-    .logo-container {
-        display: flex;
-        justify-content: flex-end;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-col1, col2 = st.columns([8, 2])
-with col2:
-    st.image("Logo.png", width=120) 
-
 # Funciones utilitarias
 def cargar_datos(uploaded_file):
     try:
@@ -67,7 +51,24 @@ def mostrar_grafico(data, column_x, column_y, plot_type):
     st.pyplot(plt)
     plt.clf()
 
+   
 # Configuración de la app
+st.markdown(
+    """
+    <style>
+    .logo-container {
+        display: flex;
+        justify-content: flex-end;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+col1, col2 = st.columns([8, 2])
+with col2:
+    st.image("Logo.png", width=120)
+    
 st.markdown("""
     <style>
     .gradient-text {
@@ -96,10 +97,12 @@ st.write("## <span style='color: #EA937F;'>1. Cargar Datos</span>", unsafe_allow
 uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
 
 if uploaded_file:
-    data = cargar_datos(uploaded_file)
-    if data is not None:
-        st.write("Vista previa de los datos cargados:")
-        st.dataframe(data.head())
+    data = pd.read_csv(uploaded_file, encoding='latin-1')
+    st.write("Vista previa de los datos cargados:")
+    st.dataframe(data.head())
+else:
+    st.warning("Por favor, sube un archivo CSV para continuar.")
+    st.stop()
 
 # Comparación Gráfica
 st.write("## <span style='color: #EA937F; font-size: 24px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
@@ -137,8 +140,6 @@ if column_x and column_y:
     elif plot_type == "Boxplot":
         st.write(f"El boxplot entre **{column_x}** y **{column_y}** permite visualizar la dispersión y presencia de valores atípicos. "
                  "Si hay una gran cantidad de valores fuera de los bigotes del boxplot, es posible que existan outliers significativos.")
-
-
 
         # Selección de la variable objetivo
         st.write("## <span style='color: #EA937F;'>2. Selección de Columnas</span>", unsafe_allow_html=True)
