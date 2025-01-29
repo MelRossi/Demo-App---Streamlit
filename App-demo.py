@@ -251,13 +251,20 @@ if target_col and feature_cols:
             result_df["Probabilidad"] = probabilities.max(axis=1)
             st.dataframe(result_df)
 
-           # Crear histograma de probabilidades
+            # Crear gráfico solo si hay más de una clase predicha
             fig, ax = plt.subplots()
-            sns.histplot(result_df["Probabilidad"], bins=10, kde=True, color="#4292C6", ax=ax)
-            ax.set_title("Distribución de Probabilidades de Predicción")
-            ax.set_xlabel("Probabilidad máxima asignada")
-            ax.set_ylabel("Frecuencia")
-            st.pyplot(fig)
+
+            pred_counts = result_df["Predicción"].value_counts()
+
+            if len(pred_counts) > 1:
+                pred_counts.plot(kind="bar", ax=ax, color=["#08306B", "#4292C6"])
+                ax.set_title("Distribución de Predicciones")
+                ax.set_xlabel("Clase Predicha")
+                ax.set_ylabel("Frecuencia")
+                st.pyplot(fig)
+            else:
+                st.warning("Todas las predicciones pertenecen a una sola clase. Puede ser necesario ajustar los datos o el modelo.")
+
 
             st.download_button(
                 label="Descargar resultados",
