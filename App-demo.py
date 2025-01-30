@@ -116,19 +116,42 @@ if 'data' not in locals():
     st.error("Error: No se han cargado datos. Por favor, sube un archivo CSV antes de continuar.")
     st.stop()
 
-# Seleccionar el tipo de gráfico antes de las columnas
+# Seleccionar el tipo de gráfico
 plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
 
-# Si el usuario elige "Histograma", selecciona solo una variable
+# Obtener columnas numéricas y categóricas
+numeric_columns = data.select_dtypes(include=['number']).columns
+categorical_columns = data.select_dtypes(exclude=['number']).columns
+
+# Filtrar variables según el gráfico seleccionado
 if plot_type == "Histograma":
-    column_x = st.selectbox("Selecciona la variable para el histograma:", data.columns, key="col_hist")
-    column_y = None  # No se usa una segunda variable
-else:
+    # Asegurar que haya al menos una variable numérica disponible
+    if len(numeric_columns) == 0:
+        st.error("No hay variables numéricas en el dataset. No se puede generar un histograma.")
+        st.stop()
+    column_x = st.selectbox("Selecciona una variable numérica para el histograma:", numeric_columns, key="col_hist")
+    column_y = None  # No se necesita segunda variable
+
+elif plot_type == "Scatterplot":
+    col1, col2 = st.columns(2)
+    with col1:
+        column_x = st.selectbox("Selecciona la primera columna (X):", numeric_columns, key="col_x")
+    with col2:
+        column_y = st.selectbox("Selecciona la segunda columna (Y):", numeric_columns, key="col_y")
+
+elif plot_type == "Heatmap":
     col1, col2 = st.columns(2)
     with col1:
         column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
     with col2:
         column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
+
+elif plot_type == "Boxplot":
+    col1, col2 = st.columns(2)
+    with col1:
+        column_x = st.selectbox("Selecciona la variable categórica (X):", categorical_columns, key="col_x")
+    with col2:
+        column_y = st.selectbox("Selecciona la variable numérica (Y):", numeric_columns, key="col_y")
 
 # Verificar que la variable está definida antes de continuar
 if column_x:
