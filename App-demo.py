@@ -258,7 +258,14 @@ if target_col and feature_cols:
            
     # Agregar conclusión basada en los resultados
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
-    st.write("El modelo ha sido entrenado exitosamente y evaluado en los datos de prueba. La exactitud obtenida indica el rendimiento del modelo en la clasificación de los datos. Se recomienda revisar la matriz de confusión y la curva ROC para analizar el comportamiento de las predicciones. Dependiendo del objetivo clínico, se pueden ajustar los hiperparámetros o probar modelos adicionales para mejorar los resultados.")
+    st.write("Métricas de evaluación:\n
+"- Precisión (Precision): De todas las predicciones positivas realizadas por el modelo, ¿cuántas fueron realmente correctas?\n
+"- Recall (Sensibilidad): De todos los casos positivos reales, ¿cuántos fueron correctamente identificados por el modelo?\n
+"- F1-score: Media armónica entre precisión y recall. Ofrece un equilibrio entre precisión y recall.
+"- Accuracy (Exactitud): Del total de predicciones realizadas, ¿cuántas fueron correctas? Mide el rendimiento general del modelo.
+"- Support (Soporte): Número de muestras en cada clase. Indica cuántos ejemplos reales hay de cada clase.
+"- Macro avg (Promedio macro): Promedio no ponderado de las métricas (precisión, recall, F1) para cada clase.
+"- Weighted avg (Promedio ponderado): Promedio ponderado de las métricas para cada clase, donde los pesos son el soporte (número de muestras en cada clase).")
 
     st.write("## <span style='color: #EA937F;'>4. Predicción</span>", unsafe_allow_html=True)
     predict_file = st.file_uploader("Archivo de predicción (CSV):", type=["csv"], key="predict")
