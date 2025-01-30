@@ -26,7 +26,6 @@ def cargar_datos(uploaded_file):
         st.error(f"Error al cargar el archivo: {e}")
         return None
 
-@st.cache_data
 def realizar_grid_search(estimator, param_grid, X_train, y_train):
     grid_search = GridSearchCV(estimator, param_grid, scoring='accuracy', cv=5, n_jobs=-1)
     grid_search.fit(X_train, y_train)
