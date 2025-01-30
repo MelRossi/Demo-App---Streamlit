@@ -220,14 +220,13 @@ target_col = st.selectbox(
 feature_cols = st.multiselect("Selecciona las características (X):", [col for col in data.columns if col != target_col])
 
 if target_col and feature_cols:
-    st.write("## <span style='color: #EA937F;'>4. Entrenamiento del Modelo</span>", unsafe_allow_html=True)
-
+    st.write("## <span style='color: #EA937F;'>3. Entrenamiento del Modelo</span>", unsafe_allow_html=True)
     X = data[feature_cols]
     y = data[target_col]
 
-    X = pd.get_dummies(X, drop_first=True) # One-hot encoding
+    X = pd.get_dummies(X, drop_first=True)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y) # Stratify para mantener proporciones de clases
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
@@ -236,57 +235,56 @@ if target_col and feature_cols:
     smote = SMOTE(random_state=42)
     X_train_res, y_train_res = smote.fit_resample(X_train_scaled, y_train)
 
-# Modelos y parámetros
-param_grid_lr = {'penalty': ('l1', 'l2'), 'C': np.arange(0.1, 10.1, 0.1).tolist(), 'solver': ('liblinear', 'saga')} # Convertir a lista
-param_grid_dt = {'max_depth': tuple([None, 5, 10, 20]), 'min_samples_split': tuple([2, 5, 10]), 'min_samples_leaf': tuple([1, 2, 4]), 'criterion': ('gini', 'entropy')}
-param_grid_rf = {'n_estimators': tuple([100, 200, 300]), 'max_depth': tuple([None, 5, 10]), 'min_samples_split': tuple([2, 5, 10])}
-        
-best_params_lr = realizar_grid_search(LogisticRegression(random_state=42), param_grid_lr, X_train_res, y_train_res)
-best_params_dt = realizar_grid_search(DecisionTreeClassifier(random_state=42), param_grid_dt, X_train_res, y_train_res)
-best_params_rf = realizar_grid_search(RandomForestClassifier(random_state=42), param_grid_rf, X_train_res, y_train_res)
+    # Modelos y parámetros
+    param_grid_lr = {'penalty': ['l1', 'l2'], 'C': [0.1, 1, 10], 'solver': ['liblinear', 'saga']}
+    param_grid_dt = {'max_depth': [None, 5, 10, 20], 'min_samples_split': [2, 5, 10], 'min_samples_leaf': [1, 2, 4], 'criterion': ['gini', 'entropy']}
+    param_grid_rf = {'n_estimators': [100, 200, 300], 'max_depth': [None, 5, 10], 'min_samples_split': [2, 5, 10]}
 
-st.write("## <span style='color: #EA937F; font-size: 24px; '>Selecciona el modelo de aprendizaje:</span>", unsafe_allow_html=True)
-model_choice = st.selectbox("Modelo:", ["Logistic Regression", "Decision Tree", "Random Forest"])
+    best_params_lr = realizar_grid_search(LogisticRegression(random_state=42), param_grid_lr, X_train_res, y_train_res)
+    best_params_dt = realizar_grid_search(DecisionTreeClassifier(random_state=42), param_grid_dt, X_train_res, y_train_res)
+    best_params_rf = realizar_grid_search(RandomForestClassifier(random_state=42), param_grid_rf, X_train_res, y_train_res)
 
-if model_choice == "Logistic Regression":
-    modelo = LogisticRegression(**best_params_lr, max_iter=1000, random_state=42)
-elif model_choice == "Decision Tree":
-    modelo = DecisionTreeClassifier(**best_params_dt, random_state=42)
-elif model_choice == "Random Forest":
-    modelo = RandomForestClassifier(**best_params_rf, random_state=42)
+    st.write("## <span style='color: #EA937F; font-size: 24px; '>Selecciona el modelo de aprendizaje:</span>", unsafe_allow_html=True)
+    model_choice = st.selectbox("Modelo:", ["Logistic Regression", "Decision Tree", "Random Forest"])
 
-modelo.fit(X_train_res, y_train_res)
+    if model_choice == "Logistic Regression":
+        modelo = LogisticRegression(**best_params_lr, max_iter=1000, random_state=42)
+    elif model_choice == "Decision Tree":
+        modelo = DecisionTreeClassifier(**best_params_dt, random_state=42)
+    elif model_choice == "Random Forest":
+        modelo = RandomForestClassifier(**best_params_rf, random_state=42)
 
-y_pred = modelo.predict(X_test_scaled)
-y_prob = modelo.predict_proba(X_test_scaled)
+    modelo.fit(X_train_res, y_train_res)
 
-accuracy = accuracy_score(y_test, y_pred)
-st.write("**Exactitud del modelo:**", accuracy)
+    y_pred = modelo.predict(X_test_scaled)
+    y_prob = modelo.predict_proba(X_test_scaled)
 
-if len(np.unique(y_test)) > 2:
-    roc_auc = roc_auc_score(y_test, y_prob, multi_class='ovr')
-    st.write("**AUC-ROC (multiclase):**", roc_auc)
-else:
-    roc_auc = roc_auc_score(y_test, y_prob[:, 1])
-    st.write("**AUC-ROC:**", roc_auc)
-    fpr, tpr, _ = roc_curve(y_test, y_prob[:, 1])
-    plt.figure()
-    plt.plot(fpr, tpr, label=f"ROC curve (area = {roc_auc:.2f})")
-    plt.plot([0, 1], [0, 1], "k--")
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
-    plt.title("Curva ROC")
-    plt.legend(loc="lower right")
+    accuracy = accuracy_score(y_test, y_pred)
+    st.write("**Exactitud del modelo:**", accuracy)
+
+    if len(np.unique(y_test)) > 2:
+        roc_auc = roc_auc_score(y_test, y_prob, multi_class='ovr')
+        st.write("**AUC-ROC (multiclase):**", roc_auc)
+    else:
+        roc_auc = roc_auc_score(y_test, y_prob[:, 1])
+        st.write("**AUC-ROC:**", roc_auc)
+
+        fpr, tpr, _ = roc_curve(y_test, y_prob[:, 1])
+        plt.figure()
+        plt.plot(fpr, tpr, label=f"ROC curve (area = {roc_auc:.2f})")
+        plt.plot([0, 1], [0, 1], "k--")
+        plt.xlabel("False Positive Rate")
+        plt.ylabel("True Positive Rate")
+        plt.title("Curva ROC")
+        plt.legend(loc="lower right")
+        st.pyplot(plt)
+
+    st.write("**Matriz de Confusión:**")
+    cm = confusion_matrix(y_test, y_pred)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=np.unique(y_test), yticklabels=np.unique(y_test))
+    plt.xlabel("Predicción")
+    plt.ylabel("Verdadero")
     st.pyplot(plt)
-
-st.write("**Matriz de Confusión:**")
-cm = confusion_matrix(y_test, y_pred)
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=np.unique(y_test), yticklabels=np.unique(y_test))
-plt.xlabel("Predicción")
-plt.ylabel("Verdadero")
-st.pyplot(plt)
-st.text("Reporte de Clasificación:")
-reporte = classification_report
 
 # Convertir el reporte a un DataFrame de pandas
 df_reporte = pd.DataFrame(reporte).transpose()
