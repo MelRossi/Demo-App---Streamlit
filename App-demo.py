@@ -254,7 +254,11 @@ if target_col and feature_cols:
     st.pyplot(plt)
 
     st.text("Reporte de Clasificación:")
-    st.text(classification_report(y_test, y_pred))
+    reporte = classification_report(y_test, y_pred, output_dict=True)
+    # Convertir el reporte a un DataFrame de pandas
+    df_reporte = pd.DataFrame(reporte).transpose()
+    #Usar st.table para una tabla estática
+    st.table(df_reporte)
            
     # Agregar conclusión basada en los resultados
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
