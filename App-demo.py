@@ -160,30 +160,30 @@ if column_x:
     elif column_y:
         mostrar_grafico(data, column_x, column_y, plot_type)
 
-    # Generar conclusiones basadas en los datos y el tipo de gráfico
-    st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
+   # Generar conclusiones basadas en los datos y el tipo de gráfico
+st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
 
-    if plot_type == "Scatterplot":
-        correlacion = data[column_x].corr(data[column_y])
-        if correlacion > 0.7:
-            conclusion = f"Existe una fuerte correlación positiva ({correlacion:.2f}) entre **{column_x}** y **{column_y}**."
-        elif correlacion < -0.7:
-            conclusion = f"Existe una fuerte correlación negativa ({correlacion:.2f}) entre **{column_x}** y **{column_y}**."
-        else:
-            conclusion = f"No se observa una correlación significativa ({correlacion:.2f}) entre **{column_x}** y **{column_y}**."
-        st.write(conclusion)
+if plot_type == "Scatterplot":
+    correlacion = data[column_x].corr(data[column_y])
+    if correlacion > 0.7:
+        conclusion = f"Existe una fuerte correlación positiva ({correlacion:.2f}) entre **{column_x}** y **{column_y}**."
+    elif correlacion < -0.7:
+        conclusion = f"Existe una fuerte correlación negativa ({correlacion:.2f}) entre **{column_x}** y **{column_y}**."
+    else:
+        conclusion = f"No se observa una correlación significativa ({correlacion:.2f}) entre **{column_x}** y **{column_y}**."
+    st.write(conclusion)
 
-    elif plot_type == "Heatmap":
-        tabla_contingencia = pd.crosstab(data[column_x], data[column_y])
-        conclusion = f"El heatmap muestra la distribución de **{column_x}** y **{column_y}**, sugiriendo que ciertas combinaciones ocurren con mayor frecuencia."
-        st.write(conclusion)
+elif plot_type == "Heatmap":
+    tabla_contingencia = pd.crosstab(data[column_x], data[column_y])
+    conclusion = f"El heatmap muestra la distribución de **{column_x}** y **{column_y}**, sugiriendo que ciertas combinaciones ocurren con mayor frecuencia."
+    st.write(conclusion)
 
-    elif plot_type == "Histograma":
-        sesgo_x = data[column_x].skew()
-        conclusion_x = f"**{column_x}** tiene una distribución {'sesgada a la derecha' if sesgo_x > 0.5 else 'sesgada a la izquierda' if sesgo_x < -0.5 else 'simétrica'} (sesgo = {sesgo_x:.2f})."
-        st.write(conclusion_x)
+elif plot_type == "Histograma":
+    sesgo_x = data[column_x].skew()
+    conclusion_x = f"**{column_x}** tiene una distribución {'sesgada a la derecha' if sesgo_x > 0.5 else 'sesgada a la izquierda' if sesgo_x < -0.5 else 'simétrica'} (sesgo = {sesgo_x:.2f})."
+    st.write(conclusion_x)
 
-    elif plot_type == "Boxplot":
+elif plot_type == "Boxplot":
     # Verificar que column_y es numérica antes de calcular los outliers
     if column_y in numeric_columns:
         if data[column_y].isna().sum() > 0:
