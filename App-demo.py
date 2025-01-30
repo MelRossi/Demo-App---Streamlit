@@ -111,38 +111,48 @@ else:
     st.warning("Por favor, sube un archivo CSV antes de continuar.")
     st.stop()
 
+# Inicializar column_x y column_y como None para evitar NameError
+column_x, column_y = None, None
+
 # Verificar que los datos están cargados antes de continuar
-if "data" not in locals() or data is None:
+if "data" not in locals() or data is None or data.empty:
     st.error("Error: No se han cargado datos. Por favor, sube un archivo CSV antes de continuar.")
     st.stop()
 
-# Obtener columnas numéricas y categóricas solo si data tiene contenido
-if not data.empty:
-    numeric_columns = data.select_dtypes(include=['number']).columns
-    categorical_columns = data.select_dtypes(exclude=['number']).columns
-else:
-    numeric_columns, categorical_columns = [], []  # Asegurar que existen para evitar NameError
-
-# Verificar que hay columnas numéricas antes de seguir
-if len(numeric_columns) == 0:
-    st.warning("No hay variables numéricas en el dataset. Algunas visualizaciones pueden no estar disponibles.")
-
-if len(categorical_columns) == 0:
-    st.warning("No hay variables categóricas en el dataset. Algunas visualizaciones pueden no estar disponibles.")
+# Obtener columnas numéricas y categóricas
+numeric_columns = data.select_dtypes(include=['number']).columns
+categorical_columns = data.select_dtypes(exclude=['number']).columns
 
 # Seleccionar el tipo de gráfico
 plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
 
-# Asegurar que numeric_columns está definido antes de usarlo
-if plot_type == "Scatterplot" and len(numeric_columns) > 1:
+# Asegurar que column_x y column_y solo se definan si hay columnas disponibles
+if plot_type == "Histograma" and len(numeric_columns) > 0:
+    column_x = st.selectbox("Selecciona una variable numérica para el histograma:", numeric_columns, key="col_hist")
+
+elif plot_type == "Scatterplot" and len(numeric_columns) > 1:
     col1, col2 = st.columns(2)
     with col1:
         column_x = st.selectbox("Selecciona la primera columna (X):", numeric_columns, key="col_x")
     with col2:
         column_y = st.selectbox("Selecciona la segunda columna (Y):", numeric_columns, key="col_y")
 
-# Verificar que la variable está definida antes de continuar
-if column_x:
+elif plot_type == "Heatmap":
+    col1, col2 = st.columns(2)
+    with col1:
+        column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
+    with col2:
+        column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
+
+elif plot_type == "Boxplot" and len(categorical_columns) > 0 and len(numeric_columns) > 0:
+    col1, col2 = st.columns(2)
+    with col1:
+        column_x = st.selectbox("Selecciona la variable categórica (X):", categorical_columns, key="col_x")
+    with col2:
+        column_y = st.selectbox("Selecciona la variable numérica (Y):", numeric_columns, key="col_y")
+
+# Verificar que column_x esté definido antes de usarlo
+if column_x is not None:
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Gráfico</span>", unsafe_allow_html=True)
 
     if plot_type == "Histograma":
