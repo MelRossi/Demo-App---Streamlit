@@ -112,16 +112,11 @@ else:
     st.stop()
 
 # Verificar que los datos están cargados antes de proceder
-if "data" not in locals() or data is None:
+if 'data' not in locals():
     st.error("Error: No se han cargado datos. Por favor, sube un archivo CSV antes de continuar.")
     st.stop()
 
-# Verificar si `data` tiene columnas antes de usar `selectbox`
-if data.empty or data.shape[1] == 0:
-    st.error("El archivo de datos está vacío o no tiene columnas.")
-    st.stop()
-
-# Seleccionar el tipo de gráfico antes de definir las variables
+# Seleccionar el tipo de gráfico antes de las columnas
 plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
 
 # Si el usuario elige "Histograma", selecciona solo una variable
@@ -135,7 +130,7 @@ else:
     with col2:
         column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
 
-# Validar que la variable seleccionada no sea None
+# Verificar que la variable está definida antes de continuar
 if column_x:
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Gráfico</span>", unsafe_allow_html=True)
 
