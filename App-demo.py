@@ -32,37 +32,25 @@ def realizar_grid_search(estimator, param_grid, X_train, y_train):
     return grid_search.best_params_
 
 def mostrar_grafico(data, column_x, column_y, plot_type):
-    plt.figure(figsize=(8, 6))
-
+    plt.figure(figsize=(10, 6))
     if plot_type == "Scatterplot":
-        sns.scatterplot(x=column_x, y=column_y, data=data, color="blue")
-        plt.title(f"Scatterplot de {column_x} vs {column_y}")
-        plt.xlabel(column_x)
-        plt.ylabel(column_y)
-
+        sns.scatterplot(data=data, x=column_x, y=column_y, hue=column_y, palette="viridis")
+        plt.title(f"Scatterplot entre {column_x} y {column_y}")
     elif plot_type == "Heatmap":
-        tabla_contingencia = pd.crosstab(data[column_x], data[column_y])
-        sns.heatmap(tabla_contingencia, annot=True, cmap="YlGnBu")
-        plt.title(f"Heatmap de {column_x} vs {column_y}")
-        plt.xlabel(column_x)
-        plt.ylabel(column_y)
-
-    elif plot_type == "Boxplot":
-        sns.boxplot(y=column_x, data=data, color="skyblue")
-        plt.title(f"Boxplot de {column_x}")
-        plt.ylabel(column_x)
-
+        contingency_table = pd.crosstab(data[column_x], data[column_y])
+        sns.heatmap(contingency_table, annot=True, fmt="d", cmap="YlGnBu")
+        plt.title(f"Heatmap (tabla de contingencia) entre {column_x} y {column_y}")
     elif plot_type == "Histograma":
-        sns.histplot(data[column_x], kde=True, bins=20, color="blue")
-        if column_y is not None:  # Mostrar el segundo histograma solo si column_y no es None
-            sns.histplot(data[column_y], kde=True, bins=20, color="orange")
-        plt.title(f"Histograma de {column_x}")  # Título genérico para ambos casos
-        plt.xlabel("Valor")  # Etiqueta genérica para el eje x
-        plt.ylabel("Frecuencia")
-        plt.legend()  # Mostrar leyenda solo si hay dos histogramas
-
+        sns.histplot(data[column_x], kde=True, bins=20, color="blue", label=column_x)
+        sns.histplot(data[column_y], kde=True, bins=20, color="orange", label=column_y)
+        plt.legend()
+        plt.title(f"Histogramas de {column_x} y {column_y}")
+    elif plot_type == "Boxplot":
+        sns.boxplot(data=data, x=column_x, y=column_y)
+        plt.title(f"Boxplot entre {column_x} y {column_y}")
     st.pyplot(plt)
-    plt.close()
+    plt.clf()
+
    
 # Configuración de la app
 st.markdown(
@@ -103,26 +91,29 @@ st.markdown("""
     <p class="subtitle">Modelo predictivo clínico basado en inteligencia artificial</p>
 """, unsafe_allow_html=True)
 
+
 # Paso 1: Carga de datos
 st.write("## <span style='color: #EA937F;'>1. Cargar Datos</span>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
 
-# Validar que el archivo fue cargado y los datos cargados
+# Validar que el archivo fue cargado antes de continuar
 if uploaded_file is not None:
     data = cargar_datos(uploaded_file)
 
     if data is not None:  # Verifica que la carga fue exitosa
         st.write("Vista previa de los datos cargados:")
         st.dataframe(data.head())
-
-        # ... (resto de tu código para generar gráficos, análisis, etc.) ...
-
     else:
         st.error("No se pudieron cargar los datos. Verifica el archivo e intenta nuevamente.")
-        st.stop()  # Detiene la ejecución si hay un error en la carga
+        st.stop()
 else:
     st.warning("Por favor, sube un archivo CSV para continuar.")
-    st.stop()  # Detiene la ejecución si no se sube ningún archivo
+    st.stop()
+
+# Verificar que los datos están cargados antes de proceder
+if "data" not in locals() or data is None:
+    st.error("Error: No se han cargado datos. Por favor, sube un archivo CSV antes de continuar.")
+    st.stop()
 
 # Verificar si `data` tiene columnas antes de usar `selectbox`
 if data.empty or data.shape[1] == 0:
@@ -132,10 +123,10 @@ if data.empty or data.shape[1] == 0:
 # Seleccionar el tipo de gráfico antes de definir las variables
 plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
 
-# Seleccionar columnas
+# Si el usuario elige "Histograma", selecciona solo una variable
 if plot_type == "Histograma":
     column_x = st.selectbox("Selecciona la variable para el histograma:", data.columns, key="col_hist")
-    column_y = None
+    column_y = None  # No se usa una segunda variable
 else:
     col1, col2 = st.columns(2)
     with col1:
@@ -143,17 +134,21 @@ else:
     with col2:
         column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
 
-# Validar tipos de datos
-if column_x:
-    if not validar_tipos_de_datos(data, column_x, column_y, plot_type):
-        st.stop()
-
-# Generar gráfico
+# Validar que la variable seleccionada no sea None
 if column_x:
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Gráfico</span>", unsafe_allow_html=True)
-    mostrar_grafico(data, column_x, column_y, plot_type)
 
-    # Conclusiones (adaptadas para cada tipo de gráfico)
+    if plot_type == "Histograma":
+        plt.figure(figsize=(8, 6))
+        sns.histplot(data[column_x], kde=True, bins=20, color="blue")
+        plt.title(f"Histograma de {column_x}")
+        plt.xlabel(column_x)
+        plt.ylabel("Frecuencia")
+        st.pyplot(plt)
+    elif column_y:
+        mostrar_grafico(data, column_x, column_y, plot_type)
+
+    # Generar conclusiones basadas en los datos y el tipo de gráfico
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
 
     if plot_type == "Scatterplot":
@@ -258,14 +253,16 @@ if target_col and feature_cols:
     plt.ylabel("Verdadero")
     st.pyplot(plt)
 
-# Convertir el reporte a un DataFrame de pandas
-df_reporte = pd.DataFrame(reporte).transpose()
-#Usar st.table para una tabla estática
-st.table(df_reporte)
-          
-# Agregar conclusión basada en los resultados
-st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
-st.write("""Métricas de evaluación:\n
+    st.text("Reporte de Clasificación:")
+    reporte = classification_report(y_test, y_pred, output_dict=True)
+    # Convertir el reporte a un DataFrame de pandas
+    df_reporte = pd.DataFrame(reporte).transpose()
+    #Usar st.table para una tabla estática
+    st.table(df_reporte)
+           
+    # Agregar conclusión basada en los resultados
+    st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
+    st.write("""Métricas de evaluación:\n
 - Precisión (Precision): De todas las predicciones positivas realizadas por el modelo, ¿cuántas fueron realmente correctas?\n
 - Recall (Sensibilidad): De todos los casos positivos reales, ¿cuántos fueron correctamente identificados por el modelo?\n
 - F1-score: Media armónica entre precisión y recall. Ofrece un equilibrio entre precisión y recall.
@@ -274,45 +271,45 @@ st.write("""Métricas de evaluación:\n
 - Macro avg (Promedio macro): Promedio no ponderado de las métricas (precisión, recall, F1) para cada clase.
 - Weighted avg (Promedio ponderado): Promedio ponderado de las métricas para cada clase, donde los pesos son el soporte (número de muestras en cada clase).""")
 
-st.write("## <span style='color: #EA937F;'>4. Predicción</span>", unsafe_allow_html=True)
-predict_file = st.file_uploader("Archivo de predicción (CSV):", type=["csv"], key="predict")
+    st.write("## <span style='color: #EA937F;'>4. Predicción</span>", unsafe_allow_html=True)
+    predict_file = st.file_uploader("Archivo de predicción (CSV):", type=["csv"], key="predict")
 
-if predict_file:
-    predict_data = cargar_datos(predict_file)
-    if predict_data is not None:
-        st.write("## <span style='color: #EA937F; font-size: 24px; '>Datos cargados para predicción:</span>", unsafe_allow_html=True)
-        st.dataframe(predict_data.head())
+    if predict_file:
+        predict_data = cargar_datos(predict_file)
+        if predict_data is not None:
+            st.write("## <span style='color: #EA937F; font-size: 24px; '>Datos cargados para predicción:</span>", unsafe_allow_html=True)
+            st.dataframe(predict_data.head())
 
-        predict_data = pd.get_dummies(predict_data, drop_first=True)
-        predict_data = predict_data.reindex(columns=X.columns, fill_value=0)
+            predict_data = pd.get_dummies(predict_data, drop_first=True)
+            predict_data = predict_data.reindex(columns=X.columns, fill_value=0)
 
-        predictions = modelo.predict(predict_data)
-        probabilities = modelo.predict_proba(predict_data)
+            predictions = modelo.predict(predict_data)
+            probabilities = modelo.predict_proba(predict_data)
 
-        st.write("## <span style='color: #EA937F; font-size: 24px; '>**Resultados de las predicciones:**</span>", unsafe_allow_html=True)
-        result_df = predict_data.copy()
-        result_df["Predicción"] = predictions
-        result_df["Probabilidad"] = probabilities.max(axis=1)
-        st.dataframe(result_df)
+            st.write("## <span style='color: #EA937F; font-size: 24px; '>**Resultados de las predicciones:**</span>", unsafe_allow_html=True)
+            result_df = predict_data.copy()
+            result_df["Predicción"] = predictions
+            result_df["Probabilidad"] = probabilities.max(axis=1)
+            st.dataframe(result_df)
 
-        # Crear gráfico solo si hay más de una clase predicha
-        fig, ax = plt.subplots()
+            # Crear gráfico solo si hay más de una clase predicha
+            fig, ax = plt.subplots()
 
-        pred_counts = result_df["Predicción"].value_counts()
+            pred_counts = result_df["Predicción"].value_counts()
 
-        if len(pred_counts) > 1:
-            pred_counts.plot(kind="bar", ax=ax, color=["#08306B", "#4292C6"])
-            ax.set_title("Distribución de Predicciones")
-            ax.set_xlabel("Clase Predicha")
-            ax.set_ylabel("Frecuencia")
-            st.pyplot(fig)
-        else:
-            st.warning("Todas las predicciones pertenecen a una sola clase. Puede ser necesario ajustar los datos o el modelo.")
+            if len(pred_counts) > 1:
+                pred_counts.plot(kind="bar", ax=ax, color=["#08306B", "#4292C6"])
+                ax.set_title("Distribución de Predicciones")
+                ax.set_xlabel("Clase Predicha")
+                ax.set_ylabel("Frecuencia")
+                st.pyplot(fig)
+            else:
+                st.warning("Todas las predicciones pertenecen a una sola clase. Puede ser necesario ajustar los datos o el modelo.")
 
 
-        st.download_button(
-            label="Descargar resultados",
-            data=result_df.to_csv(index=False).encode('utf-8'),
-            file_name="resultados_prediccion.csv",
-            mime="text/csv"
-        )
+            st.download_button(
+                label="Descargar resultados",
+                data=result_df.to_csv(index=False).encode('utf-8'),
+                file_name="resultados_prediccion.csv",
+                mime="text/csv"
+            )
