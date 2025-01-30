@@ -230,9 +230,9 @@ if target_col and feature_cols:
     X_train_res, y_train_res = smote.fit_resample(X_train_scaled, y_train)
 
     # Modelos y parámetros
-    param_grid_lr = {'penalty': ['l1', 'l2'], 'C': [0.1, 1, 10], 'solver': ['liblinear', 'saga']}
-    param_grid_dt = {'max_depth': [None, 5, 10, 20], 'min_samples_split': [2, 5, 10], 'min_samples_leaf': [1, 2, 4], 'criterion': ['gini', 'entropy']}
-    param_grid_rf = {'n_estimators': [100, 200, 300], 'max_depth': [None, 5, 10], 'min_samples_split': [2, 5, 10]}
+    param_grid_lr = {'penalty': ('l1', 'l2'), 'C': (0.1, 1, 10), 'solver': ('liblinear', 'saga')}  # Tuplas
+    param_grid_dt = {'max_depth': (None, 5, 10, 20), 'min_samples_split': (2, 5, 10), 'min_samples_leaf': (1, 2, 4), 'criterion': ('gini', 'entropy')}  # Tuplas
+    param_grid_rf = {'n_estimators': (100, 200, 300), 'max_depth': (None, 5, 10), 'min_samples_split': (2, 5, 10)}  # Tuplas
 
     best_params_lr = realizar_grid_search(LogisticRegression(random_state=42), param_grid_lr, X_train_res, y_train_res)
     best_params_dt = realizar_grid_search(DecisionTreeClassifier(random_state=42), param_grid_dt, X_train_res, y_train_res)
