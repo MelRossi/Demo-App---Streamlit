@@ -22,39 +22,39 @@ def cargar_datos(uploaded_file):
     try:
         data = pd.read_csv(uploaded_file, encoding='latin-1')
         return data
+    except FileNotFoundError:
+        st.error("Archivo no encontrado. Por favor, sube un archivo CSV.")
+        return None
+    except pd.errors.ParserError:
+        st.error("Error al analizar el archivo. Verifica que sea un archivo CSV válido.")
+        return None
     except Exception as e:
-        st.error(f"Error al cargar el archivo: {e}")
+        st.error(f"Error desconocido al cargar el archivo: {e}")
         return None
 
+@st.cache_data
 def realizar_grid_search(estimator, param_grid, X_train, y_train):
     grid_search = GridSearchCV(estimator, param_grid, scoring='accuracy', cv=5, n_jobs=-1)
     grid_search.fit(X_train, y_train)
     return grid_search.best_params_
 
-def mostrar_grafico(data, column_x, column_y, plot_type):
-    plt.figure(figsize=(10, 6))
-    if plot_type == "Scatterplot":
-        sns.scatterplot(data=data, x=column_x, y=column_y, hue=column_y, palette="viridis")
-        plt.title(f"Scatterplot entre {column_x} y {column_y}")
+def validar_tipos_de_datos(data, column_x, column_y, plot_type):
+    if plot_type == "Histograma":
+        if data[column_x].dtype not in ['int64', 'float64']:
+            st.error("La columna para el histograma debe ser numérica.")
+            return False
+    elif plot_type in ["Scatterplot", "Boxplot"]:
+        if data[column_x].dtype not in ['int64', 'float64'] or data[column_y].dtype not in ['int64', 'float64']:
+            st.error("Para Scatterplot y Boxplot, ambas columnas deben ser numéricas.")
+            return False
     elif plot_type == "Heatmap":
-        contingency_table = pd.crosstab(data[column_x], data[column_y])
-        sns.heatmap(contingency_table, annot=True, fmt="d", cmap="YlGnBu")
-        plt.title(f"Heatmap (tabla de contingencia) entre {column_x} y {column_y}")
-    elif plot_type == "Histograma":
-        sns.histplot(data[column_x], kde=True, bins=20, color="blue", label=column_x)
-        sns.histplot(data[column_y], kde=True, bins=20, color="orange", label=column_y)
-        plt.legend()
-        plt.title(f"Histogramas de {column_x} y {column_y}")
-    elif plot_type == "Boxplot":
-        sns.boxplot(data=data, x=column_x, y=column_y)
-        plt.title(f"Boxplot entre {column_x} y {column_y}")
-    st.pyplot(plt)
-    plt.clf()
+        if data[column_x].dtype not in ['object', 'category'] or data[column_y].dtype not in ['object', 'category']:
+            st.error("Para un Heatmap, ambas columnas deben ser categóricas.")
+            return False
+    return True
 
 def mostrar_grafico(data, column_x, column_y, plot_type):
-    """Función para generar y mostrar el gráfico según el tipo."""
-
-    plt.figure(figsize=(8, 6))  # Tamaño fijo para todos los gráficos
+    plt.figure(figsize=(8, 6))
 
     if plot_type == "Scatterplot":
         sns.scatterplot(x=column_x, y=column_y, data=data, color="blue")
@@ -63,24 +63,28 @@ def mostrar_grafico(data, column_x, column_y, plot_type):
         plt.ylabel(column_y)
 
     elif plot_type == "Heatmap":
-        # Asegurarse de que ambas columnas sean categóricas
-        if data[column_x].dtype not in ['object', 'category'] or data[column_y].dtype not in ['object', 'category']:
-            st.error("Para un Heatmap, ambas columnas deben ser categóricas.")
-            return  # Salir de la función si no son categóricas
-
         tabla_contingencia = pd.crosstab(data[column_x], data[column_y])
-        sns.heatmap(tabla_contingencia, annot=True, cmap="YlGnBu")  # Añadir anotaciones y mapa de color
+        sns.heatmap(tabla_contingencia, annot=True, cmap="YlGnBu")
         plt.title(f"Heatmap de {column_x} vs {column_y}")
         plt.xlabel(column_x)
         plt.ylabel(column_y)
 
     elif plot_type == "Boxplot":
-        sns.boxplot(y=column_x, data=data, color="skyblue")  # Boxplot vertical
+        sns.boxplot(y=column_x, data=data, color="skyblue")
         plt.title(f"Boxplot de {column_x}")
-        plt.ylabel(column_x)  # Eje Y para Boxplot vertical
+        plt.ylabel(column_x)
+
+    elif plot_type == "Histograma":
+        sns.histplot(data[column_x], kde=True, bins=20, color="blue")
+        if column_y is not None:  # Mostrar el segundo histograma solo si column_y no es None
+            sns.histplot(data[column_y], kde=True, bins=20, color="orange")
+        plt.title(f"Histograma de {column_x}")  # Título genérico para ambos casos
+        plt.xlabel("Valor")  # Etiqueta genérica para el eje x
+        plt.ylabel("Frecuencia")
+        plt.legend()  # Mostrar leyenda solo si hay dos histogramas
 
     st.pyplot(plt)
-    plt.close()  # Limpiar la figura para evitar superposición de gráficos
+    plt.close()
    
 # Configuración de la app
 st.markdown(
@@ -121,7 +125,6 @@ st.markdown("""
     <p class="subtitle">Modelo predictivo clínico basado en inteligencia artificial</p>
 """, unsafe_allow_html=True)
 
-
 # Paso 1: Carga de datos
 st.write("## <span style='color: #EA937F;'>1. Cargar Datos</span>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
@@ -151,24 +154,10 @@ if data.empty or data.shape[1] == 0:
 # Seleccionar el tipo de gráfico antes de definir las variables
 plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
 
-# Validación de columnas y tipos de datos ANTES de generar el gráfico
-if column_x:
-    if plot_type == "Histograma":
-        # Validar que la columna sea numérica para el histograma
-        if data[column_x].dtype not in ['int64', 'float64']:
-            st.error("La columna para el histograma debe ser numérica.")
-            st.stop()  # Detener la ejecución si la validación falla
-    elif column_y:
-        # Validar que ambas columnas sean numéricas para Scatterplot y Boxplot
-        if plot_type in ["Scatterplot", "Boxplot"]:
-            if data[column_x].dtype not in ['int64', 'float64'] or data[column_y].dtype not in ['int64', 'float64']:
-                st.error("Para Scatterplot y Boxplot, ambas columnas deben ser numéricas.")
-                st.stop()  # Detener la ejecución si la validación falla
-
-# Si el usuario elige "Histograma", selecciona solo una variable
+# Seleccionar columnas
 if plot_type == "Histograma":
     column_x = st.selectbox("Selecciona la variable para el histograma:", data.columns, key="col_hist")
-    column_y = None  # No se usa una segunda variable
+    column_y = None
 else:
     col1, col2 = st.columns(2)
     with col1:
@@ -176,21 +165,17 @@ else:
     with col2:
         column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
 
-# Validar que la variable seleccionada no sea None
+# Validar tipos de datos
+if column_x:
+    if not validar_tipos_de_datos(data, column_x, column_y, plot_type):
+        st.stop()
+
+# Generar gráfico
 if column_x:
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Gráfico</span>", unsafe_allow_html=True)
+    mostrar_grafico(data, column_x, column_y, plot_type)
 
-    if plot_type == "Histograma":
-        plt.figure(figsize=(8, 6))
-        sns.histplot(data[column_x], kde=True, bins=20, color="blue")
-        plt.title(f"Histograma de {column_x}")
-        plt.xlabel(column_x)
-        plt.ylabel("Frecuencia")
-        st.pyplot(plt)
-    elif column_y:
-        mostrar_grafico(data, column_x, column_y, plot_type)
-
-    # Generar conclusiones basadas en los datos y el tipo de gráfico
+    # Conclusiones (adaptadas para cada tipo de gráfico)
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
 
     if plot_type == "Scatterplot":
@@ -296,7 +281,7 @@ if target_col and feature_cols:
     st.pyplot(plt)
 
     st.text("Reporte de Clasificación:")
-    reporte = classification_report(y_test, y_pred, output_dict=True)
+    reporte = classification_report
     # Convertir el reporte a un DataFrame de pandas
     df_reporte = pd.DataFrame(reporte).transpose()
     #Usar st.table para una tabla estática
