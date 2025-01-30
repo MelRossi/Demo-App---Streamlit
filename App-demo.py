@@ -146,7 +146,7 @@ elif plot_type == "Heatmap":
     with col2:
         column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
 
-elif plot_type == "Boxplot":
+if plot_type == "Boxplot":
     col1, col2 = st.columns(2)
     with col1:
         column_x = st.selectbox("Selecciona la variable categórica (X):", categorical_columns, key="col_x")
