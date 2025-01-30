@@ -191,10 +191,20 @@ if column_x:
         st.write(conclusion_x)
 
     elif plot_type == "Boxplot":
-        outliers_x = ((data[column_x] < data[column_x].quantile(0.25) - 1.5 * (data[column_x].quantile(0.75) - data[column_x].quantile(0.25))) | 
-                      (data[column_x] > data[column_x].quantile(0.75) + 1.5 * (data[column_x].quantile(0.75) - data[column_x].quantile(0.25)))).sum()
-        conclusion_x = f"**{column_x}** tiene {outliers_x} valores atípicos detectados."
-        st.write(conclusion_x)
+    # Verificar que column_y es numérica antes de calcular los outliers
+    if column_y in numeric_columns:
+        if data[column_y].isna().sum() > 0:
+            st.warning(f"La variable **{column_y}** contiene valores nulos. Los resultados pueden no ser precisos.")
+
+        # Calcular outliers usando IQR (rango intercuartílico)
+        q1 = data[column_y].quantile(0.25)
+        q3 = data[column_y].quantile(0.75)
+        iqr = q3 - q1  # Rango intercuartílico
+        outliers_y = ((data[column_y] < q1 - 1.5 * iqr) | (data[column_y] > q3 + 1.5 * iqr)).sum()
+        
+        st.write(f"**{column_y}** tiene {outliers_y} valores atípicos detectados.")
+    else:
+        st.warning(f"La variable **{column_y}** no es numérica. No se pueden calcular valores atípicos.")
 
 # Selección de la variable objetivo
 st.write("## <span style='color: #EA937F;'>2. Selección de Columnas</span>", unsafe_allow_html=True)
