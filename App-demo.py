@@ -34,10 +34,16 @@ def cargar_datos(uploaded_file):
 
 @st.cache_data
 def realizar_grid_search(estimator, param_grid, X_train, y_train):
-    grid_search = GridSearchCV(estimator, param_grid, scoring='accuracy', cv=5, n_jobs=-1)
+    for key, value in param_grid.items():
+        print(f"Key: {key}, Value: {value}, Type: {type(value)}")
+        if isinstance(value, (list, np.ndarray)):
+            for element in value:
+                print(f"Element: {element}, Type: {type(element)}")
+
+    grid_search = GridSearchCV(estimator, param_grid, scoring='accuracy', cv=5, n_jobs=-1, verbose=0)
     grid_search.fit(X_train, y_train)
     return grid_search.best_params_
-
+    
 def validar_tipos_de_datos(data, column_x, column_y, plot_type):
     if plot_type == "Histograma":
         if data[column_x].dtype not in ['int64', 'float64']:
@@ -234,7 +240,7 @@ if target_col and feature_cols:
     param_grid_lr = {'penalty': ('l1', 'l2'), 'C': np.arange(0.1, 10.1, 0.1), 'solver': ('liblinear', 'saga')}  # Usa np.arange y convierte a tupla si es necesario
     param_grid_dt = {'max_depth': tuple([None, 5, 10, 20]), 'min_samples_split': tuple([2, 5, 10]), 'min_samples_leaf': tuple([1, 2, 4]), 'criterion': ('gini', 'entropy')}
     param_grid_rf = {'n_estimators': tuple([100, 200, 300]), 'max_depth': tuple([None, 5, 10]), 'min_samples_split': tuple([2, 5, 10])}
-    
+        
     best_params_lr = realizar_grid_search(LogisticRegression(random_state=42), param_grid_lr, X_train_res, y_train_res)
     best_params_dt = realizar_grid_search(DecisionTreeClassifier(random_state=42), param_grid_dt, X_train_res, y_train_res)
     best_params_rf = realizar_grid_search(RandomForestClassifier(random_state=42), param_grid_rf, X_train_res, y_train_res)
