@@ -125,6 +125,24 @@ else:
     with col2:
         column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
 
+# Comparación Gráfica
+st.write("## <span style='color: #EA937F; font-size: 24px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
+st.write("Selecciona la variable o variables y el tipo de gráfico a visualizar:")
+
+# Seleccionar el tipo de gráfico antes de seleccionar las columnas
+plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
+
+# Si el usuario elige "Histograma", solo selecciona una variable
+if plot_type == "Histograma":
+    column_x = st.selectbox("Selecciona la variable para el histograma:", data.columns, key="col_hist")
+    column_y = None  # No se usa una segunda variable
+else:
+    col1, col2 = st.columns(2)
+    with col1:
+        column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
+    with col2:
+        column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
+
 # Generar el gráfico
 if column_x:
     if plot_type == "Histograma":
