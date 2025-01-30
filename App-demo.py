@@ -22,42 +22,14 @@ def cargar_datos(uploaded_file):
     try:
         data = pd.read_csv(uploaded_file, encoding='latin-1')
         return data
-    except FileNotFoundError:
-        st.error("Archivo no encontrado. Por favor, sube un archivo CSV.")
-        return None
-    except pd.errors.ParserError:
-        st.error("Error al analizar el archivo. Verifica que sea un archivo CSV válido.")
-        return None
     except Exception as e:
-        st.error(f"Error desconocido al cargar el archivo: {e}")
+        st.error(f"Error al cargar el archivo: {e}")
         return None
 
-@st.cache_data
 def realizar_grid_search(estimator, param_grid, X_train, y_train):
-    for key, value in param_grid.items():
-        print(f"Key: {key}, Value: {value}, Type: {type(value)}")
-        if isinstance(value, (list, np.ndarray)):
-            for element in value:
-                print(f"Element: {element}, Type: {type(element)}")
-
-    grid_search = GridSearchCV(estimator, param_grid, scoring='accuracy', cv=5, n_jobs=-1, verbose=0)
+    grid_search = GridSearchCV(estimator, param_grid, scoring='accuracy', cv=5, n_jobs=-1)
     grid_search.fit(X_train, y_train)
     return grid_search.best_params_
-    
-def validar_tipos_de_datos(data, column_x, column_y, plot_type):
-    if plot_type == "Histograma":
-        if data[column_x].dtype not in ['int64', 'float64']:
-            st.error("La columna para el histograma debe ser numérica.")
-            return False
-    elif plot_type in ["Scatterplot", "Boxplot"]:
-        if data[column_x].dtype not in ['int64', 'float64'] or data[column_y].dtype not in ['int64', 'float64']:
-            st.error("Para Scatterplot y Boxplot, ambas columnas deben ser numéricas.")
-            return False
-    elif plot_type == "Heatmap":
-        if data[column_x].dtype not in ['object', 'category'] or data[column_y].dtype not in ['object', 'category']:
-            st.error("Para un Heatmap, ambas columnas deben ser categóricas.")
-            return False
-    return True
 
 def mostrar_grafico(data, column_x, column_y, plot_type):
     plt.figure(figsize=(8, 6))
