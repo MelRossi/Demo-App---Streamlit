@@ -214,13 +214,14 @@ target_col = st.selectbox(
 feature_cols = st.multiselect("Selecciona las características (X):", [col for col in data.columns if col != target_col])
 
 if target_col and feature_cols:
-    st.write("## <span style='color: #EA937F;'>3. Entrenamiento del Modelo</span>", unsafe_allow_html=True)
+    st.write("## <span style='color: #EA937F;'>4. Entrenamiento del Modelo</span>", unsafe_allow_html=True)
+
     X = data[feature_cols]
     y = data[target_col]
 
-    X = pd.get_dummies(X, drop_first=True)
+    X = pd.get_dummies(X, drop_first=True) # One-hot encoding
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y) # Stratify para mantener proporciones de clases
 
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
