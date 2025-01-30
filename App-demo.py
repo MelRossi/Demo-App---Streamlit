@@ -51,6 +51,36 @@ def mostrar_grafico(data, column_x, column_y, plot_type):
     st.pyplot(plt)
     plt.clf()
 
+def mostrar_grafico(data, column_x, column_y, plot_type):
+    """Función para generar y mostrar el gráfico según el tipo."""
+
+    plt.figure(figsize=(8, 6))  # Tamaño fijo para todos los gráficos
+
+    if plot_type == "Scatterplot":
+        sns.scatterplot(x=column_x, y=column_y, data=data, color="blue")
+        plt.title(f"Scatterplot de {column_x} vs {column_y}")
+        plt.xlabel(column_x)
+        plt.ylabel(column_y)
+
+    elif plot_type == "Heatmap":
+        # Asegurarse de que ambas columnas sean categóricas
+        if data[column_x].dtype not in ['object', 'category'] or data[column_y].dtype not in ['object', 'category']:
+            st.error("Para un Heatmap, ambas columnas deben ser categóricas.")
+            return  # Salir de la función si no son categóricas
+
+        tabla_contingencia = pd.crosstab(data[column_x], data[column_y])
+        sns.heatmap(tabla_contingencia, annot=True, cmap="YlGnBu")  # Añadir anotaciones y mapa de color
+        plt.title(f"Heatmap de {column_x} vs {column_y}")
+        plt.xlabel(column_x)
+        plt.ylabel(column_y)
+
+    elif plot_type == "Boxplot":
+        sns.boxplot(y=column_x, data=data, color="skyblue")  # Boxplot vertical
+        plt.title(f"Boxplot de {column_x}")
+        plt.ylabel(column_x)  # Eje Y para Boxplot vertical
+
+    st.pyplot(plt)
+    plt.close()  # Limpiar la figura para evitar superposición de gráficos
    
 # Configuración de la app
 st.markdown(
@@ -96,24 +126,22 @@ st.markdown("""
 st.write("## <span style='color: #EA937F;'>1. Cargar Datos</span>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
 
-# Validar que el archivo fue cargado antes de continuar
+# Validar que el archivo fue cargado y los datos cargados
 if uploaded_file is not None:
     data = cargar_datos(uploaded_file)
 
     if data is not None:  # Verifica que la carga fue exitosa
         st.write("Vista previa de los datos cargados:")
         st.dataframe(data.head())
+
+        # ... (resto de tu código para generar gráficos, análisis, etc.) ...
+
     else:
         st.error("No se pudieron cargar los datos. Verifica el archivo e intenta nuevamente.")
-        st.stop()
+        st.stop()  # Detiene la ejecución si hay un error en la carga
 else:
     st.warning("Por favor, sube un archivo CSV para continuar.")
-    st.stop()
-
-# Verificar que los datos están cargados antes de proceder
-if "data" not in locals() or data is None:
-    st.error("Error: No se han cargado datos. Por favor, sube un archivo CSV antes de continuar.")
-    st.stop()
+    st.stop()  # Detiene la ejecución si no se sube ningún archivo
 
 # Verificar si `data` tiene columnas antes de usar `selectbox`
 if data.empty or data.shape[1] == 0:
@@ -122,6 +150,20 @@ if data.empty or data.shape[1] == 0:
 
 # Seleccionar el tipo de gráfico antes de definir las variables
 plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
+
+# Validación de columnas y tipos de datos ANTES de generar el gráfico
+if column_x:
+    if plot_type == "Histograma":
+        # Validar que la columna sea numérica para el histograma
+        if data[column_x].dtype not in ['int64', 'float64']:
+            st.error("La columna para el histograma debe ser numérica.")
+            st.stop()  # Detener la ejecución si la validación falla
+    elif column_y:
+        # Validar que ambas columnas sean numéricas para Scatterplot y Boxplot
+        if plot_type in ["Scatterplot", "Boxplot"]:
+            if data[column_x].dtype not in ['int64', 'float64'] or data[column_y].dtype not in ['int64', 'float64']:
+                st.error("Para Scatterplot y Boxplot, ambas columnas deben ser numéricas.")
+                st.stop()  # Detener la ejecución si la validación falla
 
 # Si el usuario elige "Histograma", selecciona solo una variable
 if plot_type == "Histograma":
