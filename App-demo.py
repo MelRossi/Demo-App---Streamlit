@@ -111,40 +111,35 @@ else:
     st.warning("Por favor, sube un archivo CSV antes de continuar.")
     st.stop()
 
-# Verificar que los datos están cargados antes de proceder
-if 'data' not in locals():
+# Verificar que los datos están cargados antes de continuar
+if "data" not in locals() or data is None:
     st.error("Error: No se han cargado datos. Por favor, sube un archivo CSV antes de continuar.")
     st.stop()
+
+# Obtener columnas numéricas y categóricas solo si data tiene contenido
+if not data.empty:
+    numeric_columns = data.select_dtypes(include=['number']).columns
+    categorical_columns = data.select_dtypes(exclude=['number']).columns
+else:
+    numeric_columns, categorical_columns = [], []  # Asegurar que existen para evitar NameError
+
+# Verificar que hay columnas numéricas antes de seguir
+if len(numeric_columns) == 0:
+    st.warning("No hay variables numéricas en el dataset. Algunas visualizaciones pueden no estar disponibles.")
+
+if len(categorical_columns) == 0:
+    st.warning("No hay variables categóricas en el dataset. Algunas visualizaciones pueden no estar disponibles.")
 
 # Seleccionar el tipo de gráfico
 plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
 
-# Verificar que se han seleccionado columnas antes de graficar
-column_x, column_y = None, None
-
-if plot_type == "Histograma" and len(numeric_columns) > 0:
-    column_x = st.selectbox("Selecciona una variable numérica para el histograma:", numeric_columns, key="col_hist")
-
-elif plot_type == "Scatterplot" and len(numeric_columns) > 1:
+# Asegurar que numeric_columns está definido antes de usarlo
+if plot_type == "Scatterplot" and len(numeric_columns) > 1:
     col1, col2 = st.columns(2)
     with col1:
         column_x = st.selectbox("Selecciona la primera columna (X):", numeric_columns, key="col_x")
     with col2:
         column_y = st.selectbox("Selecciona la segunda columna (Y):", numeric_columns, key="col_y")
-
-elif plot_type == "Heatmap":
-    col1, col2 = st.columns(2)
-    with col1:
-        column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
-    with col2:
-        column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
-
-elif plot_type == "Boxplot" and len(categorical_columns) > 0 and len(numeric_columns) > 0:
-    col1, col2 = st.columns(2)
-    with col1:
-        column_x = st.selectbox("Selecciona la variable categórica (X):", categorical_columns, key="col_x")
-    with col2:
-        column_y = st.selectbox("Selecciona la variable numérica (Y):", numeric_columns, key="col_y")
 
 # Verificar que la variable está definida antes de continuar
 if column_x:
