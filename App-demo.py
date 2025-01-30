@@ -125,27 +125,46 @@ plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Hea
 if column_x and column_y:
     mostrar_grafico(data, column_x, column_y, plot_type)
 
-    # Generar conclusiones basadas en el tipo de gráfico
+    # Generar conclusiones basadas en los datos y el tipo de gráfico
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
 
     if plot_type == "Scatterplot":
-        st.write(f"El gráfico de dispersión entre **{column_x}** y **{column_y}** ayuda a visualizar la relación entre ambas variables. "
-                 "Si se observa una tendencia clara (ascendente o descendente), podría indicar una correlación significativa. "
-                 "Si los puntos están dispersos sin un patrón, la relación puede ser débil o inexistente.")
+        correlacion = data[column_x].corr(data[column_y])  # Calcula la correlación entre variables
+        if correlacion > 0.7:
+            conclusion = f"Existe una fuerte correlación positiva ({correlacion:.2f}) entre **{column_x}** y **{column_y}**, lo que indica que a medida que una variable aumenta, la otra también lo hace."
+        elif correlacion < -0.7:
+            conclusion = f"Existe una fuerte correlación negativa ({correlacion:.2f}) entre **{column_x}** y **{column_y}**, lo que indica que a medida que una variable aumenta, la otra disminuye."
+        elif -0.3 < correlacion < 0.3:
+            conclusion = f"No se observa una correlación significativa ({correlacion:.2f}) entre **{column_x}** y **{column_y}**, lo que sugiere que no están linealmente relacionadas."
+        else:
+            conclusion = f"Se observa una correlación moderada ({correlacion:.2f}) entre **{column_x}** y **{column_y}**, lo que indica cierta relación entre ambas variables."
+        st.write(conclusion)
 
     elif plot_type == "Heatmap":
-        st.write(f"El heatmap muestra la distribución conjunta entre **{column_x}** y **{column_y}**. "
-                 "Valores más altos en ciertas áreas indican una mayor concentración de datos. "
-                 "Esto puede ayudar a identificar patrones en la relación entre ambas variables.")
+        tabla_contingencia = pd.crosstab(data[column_x], data[column_y])
+        if tabla_contingencia.shape[0] > 10 or tabla_contingencia.shape[1] > 10:
+            conclusion = f"El heatmap revela una gran variedad de valores en **{column_x}** y **{column_y}**, lo que puede indicar una relación compleja entre ambas variables."
+        else:
+            conclusion = f"El heatmap muestra una distribución más restringida de los valores de **{column_x}** y **{column_y}**, sugiriendo que ciertas combinaciones ocurren con mayor frecuencia."
+        st.write(conclusion)
 
     elif plot_type == "Histograma":
-        st.write(f"Los histogramas permiten analizar la distribución de las variables **{column_x}** y **{column_y}**. "
-                 "Si la forma de la distribución es sesgada o bimodal, esto puede indicar diferencias en la naturaleza de los datos "
-                 "o la presencia de subgrupos dentro de la muestra.")
+        sesgo_x = data[column_x].skew()
+        sesgo_y = data[column_y].skew()
+        conclusion_x = f"**{column_x}** tiene una distribución {'sesgada a la derecha' if sesgo_x > 0.5 else 'sesgada a la izquierda' if sesgo_x < -0.5 else 'simétrica'} (sesgo = {sesgo_x:.2f})."
+        conclusion_y = f"**{column_y}** tiene una distribución {'sesgada a la derecha' if sesgo_y > 0.5 else 'sesgada a la izquierda' if sesgo_y < -0.5 else 'simétrica'} (sesgo = {sesgo_y:.2f})."
+        st.write(conclusion_x)
+        st.write(conclusion_y)
 
     elif plot_type == "Boxplot":
-        st.write(f"El boxplot entre **{column_x}** y **{column_y}** permite visualizar la dispersión y presencia de valores atípicos. "
-                 "Si hay una gran cantidad de valores fuera de los bigotes del boxplot, es posible que existan outliers significativos.")
+        outliers_x = ((data[column_x] < data[column_x].quantile(0.25) - 1.5 * (data[column_x].quantile(0.75) - data[column_x].quantile(0.25))) | 
+                      (data[column_x] > data[column_x].quantile(0.75) + 1.5 * (data[column_x].quantile(0.75) - data[column_x].quantile(0.25)))).sum()
+        outliers_y = ((data[column_y] < data[column_y].quantile(0.25) - 1.5 * (data[column_y].quantile(0.75) - data[column_y].quantile(0.25))) | 
+                      (data[column_y] > data[column_y].quantile(0.75) + 1.5 * (data[column_y].quantile(0.75) - data[column_y].quantile(0.25)))).sum()
+        conclusion_x = f"**{column_x}** tiene {outliers_x} valores atípicos detectados en el análisis de caja."
+        conclusion_y = f"**{column_y}** tiene {outliers_y} valores atípicos detectados en el análisis de caja."
+        st.write(conclusion_x)
+        st.write(conclusion_y)
 
 # Selección de la variable objetivo
 st.write("## <span style='color: #EA937F;'>2. Selección de Columnas</span>", unsafe_allow_html=True)
