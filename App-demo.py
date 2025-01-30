@@ -204,139 +204,139 @@ if column_x:
         conclusion_x = f"**{column_x}** tiene {outliers_x} valores atípicos detectados."
         st.write(conclusion_x)
 
-        # Selección de la variable objetivo
-        st.write("## <span style='color: #EA937F;'>2. Selección de Columnas</span>", unsafe_allow_html=True)
-        target_col = st.selectbox(
-            "Variable objetivo (Y):",
-            data.columns,
-            index=data.columns.get_loc("RESPUESTA_BINARIA") if "RESPUESTA_BINARIA" in data.columns else 0
-        )
-        feature_cols = st.multiselect("Selecciona las características (X):", [col for col in data.columns if col != target_col])
-        
-        if target_col and feature_cols:
-            st.write("## <span style='color: #EA937F;'>3. Entrenamiento del Modelo</span>", unsafe_allow_html=True)
-            X = data[feature_cols]
-            y = data[target_col]
-        
-            X = pd.get_dummies(X, drop_first=True)
-        
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        
-            scaler = StandardScaler()
-            X_train_scaled = scaler.fit_transform(X_train)
-            X_test_scaled = scaler.transform(X_test)
-        
-            smote = SMOTE(random_state=42)
-            X_train_res, y_train_res = smote.fit_resample(X_train_scaled, y_train)
-        
-            # Modelos y parámetros
-            param_grid_lr = {'penalty': ['l1', 'l2'], 'C': [0.1, 1, 10], 'solver': ['liblinear', 'saga']}
-            param_grid_dt = {'max_depth': [None, 5, 10, 20], 'min_samples_split': [2, 5, 10], 'min_samples_leaf': [1, 2, 4], 'criterion': ['gini', 'entropy']}
-            param_grid_rf = {'n_estimators': [100, 200, 300], 'max_depth': [None, 5, 10], 'min_samples_split': [2, 5, 10]}
-        
-            best_params_lr = realizar_grid_search(LogisticRegression(random_state=42), param_grid_lr, X_train_res, y_train_res)
-            best_params_dt = realizar_grid_search(DecisionTreeClassifier(random_state=42), param_grid_dt, X_train_res, y_train_res)
-            best_params_rf = realizar_grid_search(RandomForestClassifier(random_state=42), param_grid_rf, X_train_res, y_train_res)
-        
-            st.write("## <span style='color: #EA937F; font-size: 24px; '>Selecciona el modelo de aprendizaje:</span>", unsafe_allow_html=True)
-            model_choice = st.selectbox("Modelo:", ["Logistic Regression", "Decision Tree", "Random Forest"])
-        
-            if model_choice == "Logistic Regression":
-                modelo = LogisticRegression(**best_params_lr, max_iter=1000, random_state=42)
-            elif model_choice == "Decision Tree":
-                modelo = DecisionTreeClassifier(**best_params_dt, random_state=42)
-            elif model_choice == "Random Forest":
-                modelo = RandomForestClassifier(**best_params_rf, random_state=42)
-        
-            modelo.fit(X_train_res, y_train_res)
-        
-            y_pred = modelo.predict(X_test_scaled)
-            y_prob = modelo.predict_proba(X_test_scaled)
-        
-            accuracy = accuracy_score(y_test, y_pred)
-            st.write("**Exactitud del modelo:**", accuracy)
-        
-            if len(np.unique(y_test)) > 2:
-                roc_auc = roc_auc_score(y_test, y_prob, multi_class='ovr')
-                st.write("**AUC-ROC (multiclase):**", roc_auc)
+# Selección de la variable objetivo
+st.write("## <span style='color: #EA937F;'>2. Selección de Columnas</span>", unsafe_allow_html=True)
+target_col = st.selectbox(
+    "Variable objetivo (Y):",
+    data.columns,
+    index=data.columns.get_loc("RESPUESTA_BINARIA") if "RESPUESTA_BINARIA" in data.columns else 0
+)
+feature_cols = st.multiselect("Selecciona las características (X):", [col for col in data.columns if col != target_col])
+
+if target_col and feature_cols:
+    st.write("## <span style='color: #EA937F;'>3. Entrenamiento del Modelo</span>", unsafe_allow_html=True)
+    X = data[feature_cols]
+    y = data[target_col]
+
+    X = pd.get_dummies(X, drop_first=True)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    smote = SMOTE(random_state=42)
+    X_train_res, y_train_res = smote.fit_resample(X_train_scaled, y_train)
+
+    # Modelos y parámetros
+    param_grid_lr = {'penalty': ['l1', 'l2'], 'C': [0.1, 1, 10], 'solver': ['liblinear', 'saga']}
+    param_grid_dt = {'max_depth': [None, 5, 10, 20], 'min_samples_split': [2, 5, 10], 'min_samples_leaf': [1, 2, 4], 'criterion': ['gini', 'entropy']}
+    param_grid_rf = {'n_estimators': [100, 200, 300], 'max_depth': [None, 5, 10], 'min_samples_split': [2, 5, 10]}
+
+    best_params_lr = realizar_grid_search(LogisticRegression(random_state=42), param_grid_lr, X_train_res, y_train_res)
+    best_params_dt = realizar_grid_search(DecisionTreeClassifier(random_state=42), param_grid_dt, X_train_res, y_train_res)
+    best_params_rf = realizar_grid_search(RandomForestClassifier(random_state=42), param_grid_rf, X_train_res, y_train_res)
+
+    st.write("## <span style='color: #EA937F; font-size: 24px; '>Selecciona el modelo de aprendizaje:</span>", unsafe_allow_html=True)
+    model_choice = st.selectbox("Modelo:", ["Logistic Regression", "Decision Tree", "Random Forest"])
+
+    if model_choice == "Logistic Regression":
+        modelo = LogisticRegression(**best_params_lr, max_iter=1000, random_state=42)
+    elif model_choice == "Decision Tree":
+        modelo = DecisionTreeClassifier(**best_params_dt, random_state=42)
+    elif model_choice == "Random Forest":
+        modelo = RandomForestClassifier(**best_params_rf, random_state=42)
+
+    modelo.fit(X_train_res, y_train_res)
+
+    y_pred = modelo.predict(X_test_scaled)
+    y_prob = modelo.predict_proba(X_test_scaled)
+
+    accuracy = accuracy_score(y_test, y_pred)
+    st.write("**Exactitud del modelo:**", accuracy)
+
+    if len(np.unique(y_test)) > 2:
+        roc_auc = roc_auc_score(y_test, y_prob, multi_class='ovr')
+        st.write("**AUC-ROC (multiclase):**", roc_auc)
+    else:
+        roc_auc = roc_auc_score(y_test, y_prob[:, 1])
+        st.write("**AUC-ROC:**", roc_auc)
+
+        fpr, tpr, _ = roc_curve(y_test, y_prob[:, 1])
+        plt.figure()
+        plt.plot(fpr, tpr, label=f"ROC curve (area = {roc_auc:.2f})")
+        plt.plot([0, 1], [0, 1], "k--")
+        plt.xlabel("False Positive Rate")
+        plt.ylabel("True Positive Rate")
+        plt.title("Curva ROC")
+        plt.legend(loc="lower right")
+        st.pyplot(plt)
+
+    st.write("**Matriz de Confusión:**")
+    cm = confusion_matrix(y_test, y_pred)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=np.unique(y_test), yticklabels=np.unique(y_test))
+    plt.xlabel("Predicción")
+    plt.ylabel("Verdadero")
+    st.pyplot(plt)
+
+    st.text("Reporte de Clasificación:")
+    reporte = classification_report
+    # Convertir el reporte a un DataFrame de pandas
+    df_reporte = pd.DataFrame(reporte).transpose()
+    #Usar st.table para una tabla estática
+    st.table(df_reporte)
+           
+    # Agregar conclusión basada en los resultados
+    st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
+    st.write("""Métricas de evaluación:\n
+- Precisión (Precision): De todas las predicciones positivas realizadas por el modelo, ¿cuántas fueron realmente correctas?\n
+- Recall (Sensibilidad): De todos los casos positivos reales, ¿cuántos fueron correctamente identificados por el modelo?\n
+- F1-score: Media armónica entre precisión y recall. Ofrece un equilibrio entre precisión y recall.
+- Accuracy (Exactitud): Del total de predicciones realizadas, ¿cuántas fueron correctas? Mide el rendimiento general del modelo.
+- Support (Soporte): Número de muestras en cada clase. Indica cuántos ejemplos reales hay de cada clase.
+- Macro avg (Promedio macro): Promedio no ponderado de las métricas (precisión, recall, F1) para cada clase.
+- Weighted avg (Promedio ponderado): Promedio ponderado de las métricas para cada clase, donde los pesos son el soporte (número de muestras en cada clase).""")
+
+    st.write("## <span style='color: #EA937F;'>4. Predicción</span>", unsafe_allow_html=True)
+    predict_file = st.file_uploader("Archivo de predicción (CSV):", type=["csv"], key="predict")
+
+    if predict_file:
+        predict_data = cargar_datos(predict_file)
+        if predict_data is not None:
+            st.write("## <span style='color: #EA937F; font-size: 24px; '>Datos cargados para predicción:</span>", unsafe_allow_html=True)
+            st.dataframe(predict_data.head())
+
+            predict_data = pd.get_dummies(predict_data, drop_first=True)
+            predict_data = predict_data.reindex(columns=X.columns, fill_value=0)
+
+            predictions = modelo.predict(predict_data)
+            probabilities = modelo.predict_proba(predict_data)
+
+            st.write("## <span style='color: #EA937F; font-size: 24px; '>**Resultados de las predicciones:**</span>", unsafe_allow_html=True)
+            result_df = predict_data.copy()
+            result_df["Predicción"] = predictions
+            result_df["Probabilidad"] = probabilities.max(axis=1)
+            st.dataframe(result_df)
+
+            # Crear gráfico solo si hay más de una clase predicha
+            fig, ax = plt.subplots()
+
+            pred_counts = result_df["Predicción"].value_counts()
+
+            if len(pred_counts) > 1:
+                pred_counts.plot(kind="bar", ax=ax, color=["#08306B", "#4292C6"])
+                ax.set_title("Distribución de Predicciones")
+                ax.set_xlabel("Clase Predicha")
+                ax.set_ylabel("Frecuencia")
+                st.pyplot(fig)
             else:
-                roc_auc = roc_auc_score(y_test, y_prob[:, 1])
-                st.write("**AUC-ROC:**", roc_auc)
-        
-                fpr, tpr, _ = roc_curve(y_test, y_prob[:, 1])
-                plt.figure()
-                plt.plot(fpr, tpr, label=f"ROC curve (area = {roc_auc:.2f})")
-                plt.plot([0, 1], [0, 1], "k--")
-                plt.xlabel("False Positive Rate")
-                plt.ylabel("True Positive Rate")
-                plt.title("Curva ROC")
-                plt.legend(loc="lower right")
-                st.pyplot(plt)
-        
-            st.write("**Matriz de Confusión:**")
-            cm = confusion_matrix(y_test, y_pred)
-            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=np.unique(y_test), yticklabels=np.unique(y_test))
-            plt.xlabel("Predicción")
-            plt.ylabel("Verdadero")
-            st.pyplot(plt)
-        
-            st.text("Reporte de Clasificación:")
-            reporte = classification_report
-            # Convertir el reporte a un DataFrame de pandas
-            df_reporte = pd.DataFrame(reporte).transpose()
-            #Usar st.table para una tabla estática
-            st.table(df_reporte)
-                   
-            # Agregar conclusión basada en los resultados
-            st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
-            st.write("""Métricas de evaluación:\n
-        - Precisión (Precision): De todas las predicciones positivas realizadas por el modelo, ¿cuántas fueron realmente correctas?\n
-        - Recall (Sensibilidad): De todos los casos positivos reales, ¿cuántos fueron correctamente identificados por el modelo?\n
-        - F1-score: Media armónica entre precisión y recall. Ofrece un equilibrio entre precisión y recall.
-        - Accuracy (Exactitud): Del total de predicciones realizadas, ¿cuántas fueron correctas? Mide el rendimiento general del modelo.
-        - Support (Soporte): Número de muestras en cada clase. Indica cuántos ejemplos reales hay de cada clase.
-        - Macro avg (Promedio macro): Promedio no ponderado de las métricas (precisión, recall, F1) para cada clase.
-        - Weighted avg (Promedio ponderado): Promedio ponderado de las métricas para cada clase, donde los pesos son el soporte (número de muestras en cada clase).""")
-        
-            st.write("## <span style='color: #EA937F;'>4. Predicción</span>", unsafe_allow_html=True)
-            predict_file = st.file_uploader("Archivo de predicción (CSV):", type=["csv"], key="predict")
-        
-            if predict_file:
-                predict_data = cargar_datos(predict_file)
-                if predict_data is not None:
-                    st.write("## <span style='color: #EA937F; font-size: 24px; '>Datos cargados para predicción:</span>", unsafe_allow_html=True)
-                    st.dataframe(predict_data.head())
-        
-                    predict_data = pd.get_dummies(predict_data, drop_first=True)
-                    predict_data = predict_data.reindex(columns=X.columns, fill_value=0)
-        
-                    predictions = modelo.predict(predict_data)
-                    probabilities = modelo.predict_proba(predict_data)
-        
-                    st.write("## <span style='color: #EA937F; font-size: 24px; '>**Resultados de las predicciones:**</span>", unsafe_allow_html=True)
-                    result_df = predict_data.copy()
-                    result_df["Predicción"] = predictions
-                    result_df["Probabilidad"] = probabilities.max(axis=1)
-                    st.dataframe(result_df)
-        
-                    # Crear gráfico solo si hay más de una clase predicha
-                    fig, ax = plt.subplots()
-        
-                    pred_counts = result_df["Predicción"].value_counts()
-        
-                    if len(pred_counts) > 1:
-                        pred_counts.plot(kind="bar", ax=ax, color=["#08306B", "#4292C6"])
-                        ax.set_title("Distribución de Predicciones")
-                        ax.set_xlabel("Clase Predicha")
-                        ax.set_ylabel("Frecuencia")
-                        st.pyplot(fig)
-                    else:
-                        st.warning("Todas las predicciones pertenecen a una sola clase. Puede ser necesario ajustar los datos o el modelo.")
-        
-        
-                    st.download_button(
-                        label="Descargar resultados",
-                        data=result_df.to_csv(index=False).encode('utf-8'),
-                        file_name="resultados_prediccion.csv",
-                        mime="text/csv"
-                    )
+                st.warning("Todas las predicciones pertenecen a una sola clase. Puede ser necesario ajustar los datos o el modelo.")
+
+
+            st.download_button(
+                label="Descargar resultados",
+                data=result_df.to_csv(index=False).encode('utf-8'),
+                file_name="resultados_prediccion.csv",
+                mime="text/csv"
+            )
