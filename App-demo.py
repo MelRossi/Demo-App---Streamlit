@@ -119,20 +119,13 @@ if 'data' not in locals():
 # Seleccionar el tipo de gráfico
 plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
 
-# Obtener columnas numéricas y categóricas
-numeric_columns = data.select_dtypes(include=['number']).columns
-categorical_columns = data.select_dtypes(exclude=['number']).columns
+# Verificar que se han seleccionado columnas antes de graficar
+column_x, column_y = None, None
 
-# Filtrar variables según el gráfico seleccionado
-if plot_type == "Histograma":
-    # Asegurar que haya al menos una variable numérica disponible
-    if len(numeric_columns) == 0:
-        st.error("No hay variables numéricas en el dataset. No se puede generar un histograma.")
-        st.stop()
+if plot_type == "Histograma" and len(numeric_columns) > 0:
     column_x = st.selectbox("Selecciona una variable numérica para el histograma:", numeric_columns, key="col_hist")
-    column_y = None  # No se necesita segunda variable
 
-elif plot_type == "Scatterplot":
+elif plot_type == "Scatterplot" and len(numeric_columns) > 1:
     col1, col2 = st.columns(2)
     with col1:
         column_x = st.selectbox("Selecciona la primera columna (X):", numeric_columns, key="col_x")
@@ -146,7 +139,7 @@ elif plot_type == "Heatmap":
     with col2:
         column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
 
-if plot_type == "Boxplot":
+elif plot_type == "Boxplot" and len(categorical_columns) > 0 and len(numeric_columns) > 0:
     col1, col2 = st.columns(2)
     with col1:
         column_x = st.selectbox("Selecciona la variable categórica (X):", categorical_columns, key="col_x")
