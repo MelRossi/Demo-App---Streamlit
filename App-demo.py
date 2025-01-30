@@ -112,59 +112,60 @@ else:
 
 # Comparación Gráfica
 st.write("## <span style='color: #EA937F; font-size: 24px; '>Comparación Gráfica</span>", unsafe_allow_html=True)
-st.write("Selecciona dos columnas para comparar y el tipo de gráfico a visualizar:")
+st.write("Selecciona la variable o variables y el tipo de gráfico a visualizar:")
 
-col1, col2 = st.columns(2)
-with col1:
-    column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
-with col2:
-    column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
+# Si el usuario elige "Histograma", solo se selecciona una variable
+if plot_type == "Histograma":
+    column_x = st.selectbox("Selecciona la variable para el histograma:", data.columns, key="col_hist")
+    column_y = None  # No se usa una segunda variable
+else:
+    col1, col2 = st.columns(2)
+    with col1:
+        column_x = st.selectbox("Selecciona la primera columna (X):", data.columns, key="col_x")
+    with col2:
+        column_y = st.selectbox("Selecciona la segunda columna (Y):", data.columns, key="col_y")
 
-plot_type = st.selectbox("Selecciona el tipo de gráfico:", ["Scatterplot", "Heatmap", "Histograma", "Boxplot"])
-
-if column_x and column_y:
-    mostrar_grafico(data, column_x, column_y, plot_type)
+# Generar el gráfico
+if column_x:
+    if plot_type == "Histograma":
+        plt.figure(figsize=(8, 6))
+        sns.histplot(data[column_x], kde=True, bins=20, color="blue")
+        plt.title(f"Histograma de {column_x}")
+        plt.xlabel(column_x)
+        plt.ylabel("Frecuencia")
+        st.pyplot(plt)
+    else:
+        if column_y:
+            mostrar_grafico(data, column_x, column_y, plot_type)
 
     # Generar conclusiones basadas en los datos y el tipo de gráfico
     st.write("## <span style='color: #EA937F; font-size: 24px;'>Conclusión</span>", unsafe_allow_html=True)
 
     if plot_type == "Scatterplot":
-        correlacion = data[column_x].corr(data[column_y])  # Calcula la correlación entre variables
+        correlacion = data[column_x].corr(data[column_y])
         if correlacion > 0.7:
-            conclusion = f"Existe una fuerte correlación positiva ({correlacion:.2f}) entre **{column_x}** y **{column_y}**, lo que indica que a medida que una variable aumenta, la otra también lo hace."
+            conclusion = f"Existe una fuerte correlación positiva ({correlacion:.2f}) entre **{column_x}** y **{column_y}**."
         elif correlacion < -0.7:
-            conclusion = f"Existe una fuerte correlación negativa ({correlacion:.2f}) entre **{column_x}** y **{column_y}**, lo que indica que a medida que una variable aumenta, la otra disminuye."
-        elif -0.3 < correlacion < 0.3:
-            conclusion = f"No se observa una correlación significativa ({correlacion:.2f}) entre **{column_x}** y **{column_y}**, lo que sugiere que no están linealmente relacionadas."
+            conclusion = f"Existe una fuerte correlación negativa ({correlacion:.2f}) entre **{column_x}** y **{column_y}**."
         else:
-            conclusion = f"Se observa una correlación moderada ({correlacion:.2f}) entre **{column_x}** y **{column_y}**, lo que indica cierta relación entre ambas variables."
+            conclusion = f"No se observa una correlación significativa ({correlacion:.2f}) entre **{column_x}** y **{column_y}**."
         st.write(conclusion)
 
     elif plot_type == "Heatmap":
         tabla_contingencia = pd.crosstab(data[column_x], data[column_y])
-        if tabla_contingencia.shape[0] > 10 or tabla_contingencia.shape[1] > 10:
-            conclusion = f"El heatmap revela una gran variedad de valores en **{column_x}** y **{column_y}**, lo que puede indicar una relación compleja entre ambas variables."
-        else:
-            conclusion = f"El heatmap muestra una distribución más restringida de los valores de **{column_x}** y **{column_y}**, sugiriendo que ciertas combinaciones ocurren con mayor frecuencia."
+        conclusion = f"El heatmap muestra la distribución de **{column_x}** y **{column_y}**, sugiriendo que ciertas combinaciones ocurren con mayor frecuencia."
         st.write(conclusion)
 
     elif plot_type == "Histograma":
         sesgo_x = data[column_x].skew()
-        sesgo_y = data[column_y].skew()
         conclusion_x = f"**{column_x}** tiene una distribución {'sesgada a la derecha' if sesgo_x > 0.5 else 'sesgada a la izquierda' if sesgo_x < -0.5 else 'simétrica'} (sesgo = {sesgo_x:.2f})."
-        conclusion_y = f"**{column_y}** tiene una distribución {'sesgada a la derecha' if sesgo_y > 0.5 else 'sesgada a la izquierda' if sesgo_y < -0.5 else 'simétrica'} (sesgo = {sesgo_y:.2f})."
         st.write(conclusion_x)
-        st.write(conclusion_y)
 
     elif plot_type == "Boxplot":
         outliers_x = ((data[column_x] < data[column_x].quantile(0.25) - 1.5 * (data[column_x].quantile(0.75) - data[column_x].quantile(0.25))) | 
                       (data[column_x] > data[column_x].quantile(0.75) + 1.5 * (data[column_x].quantile(0.75) - data[column_x].quantile(0.25)))).sum()
-        outliers_y = ((data[column_y] < data[column_y].quantile(0.25) - 1.5 * (data[column_y].quantile(0.75) - data[column_y].quantile(0.25))) | 
-                      (data[column_y] > data[column_y].quantile(0.75) + 1.5 * (data[column_y].quantile(0.75) - data[column_y].quantile(0.25)))).sum()
-        conclusion_x = f"**{column_x}** tiene {outliers_x} valores atípicos detectados en el análisis de caja."
-        conclusion_y = f"**{column_y}** tiene {outliers_y} valores atípicos detectados en el análisis de caja."
+        conclusion_x = f"**{column_x}** tiene {outliers_x} valores atípicos detectados."
         st.write(conclusion_x)
-        st.write(conclusion_y)
 
 # Selección de la variable objetivo
 st.write("## <span style='color: #EA937F;'>2. Selección de Columnas</span>", unsafe_allow_html=True)
