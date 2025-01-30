@@ -110,12 +110,6 @@ else:
     st.warning("Por favor, sube un archivo CSV para continuar.")
     st.stop()
 
-import streamlit as st
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 # Asegurar que los datos han sido cargados
 if 'data' not in locals():
     st.error("Error: No se han cargado datos. Por favor, sube un archivo CSV antes de continuar.")
