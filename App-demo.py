@@ -97,18 +97,19 @@ st.markdown("""
 st.write("## <span style='color: #EA937F;'>1. Cargar Datos</span>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
 
-# Validar que el archivo fue cargado antes de continuar
 if uploaded_file is not None:
-    data = cargar_datos(uploaded_file)
-
-    if data is not None:  # Verifica que la carga fue exitosa
+    try:
+        data = pd.read_csv(uploaded_file, encoding='latin-1')
+        if data.empty:
+            st.error("El archivo cargado está vacío. Por favor, sube un archivo con datos.")
+            st.stop()
         st.write("Vista previa de los datos cargados:")
         st.dataframe(data.head())
-    else:
-        st.error("No se pudieron cargar los datos. Verifica el archivo e intenta nuevamente.")
+    except Exception as e:
+        st.error(f"Error al leer el archivo: {e}")
         st.stop()
 else:
-    st.warning("Por favor, sube un archivo CSV para continuar.")
+    st.warning("Por favor, sube un archivo CSV antes de continuar.")
     st.stop()
 
 # Verificar que los datos están cargados antes de proceder
