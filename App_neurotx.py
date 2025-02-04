@@ -411,7 +411,7 @@ if st.sidebar.button(":stethoscope: Predecir"):
 
 # Botón para descargar los resultados
 st.download_button(
-                label="	:floppy_disk: Descargar resultados",
+                label="💾 Descargar resultados",
                 data=df_reporte.to_csv(index=False).encode('utf-8'),
                 file_name="resultados_prediccion.csv",
                 mime="text/csv"
