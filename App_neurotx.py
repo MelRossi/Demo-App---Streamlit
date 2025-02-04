@@ -401,7 +401,7 @@ for col in columnas:
 df_usuario = pd.DataFrame([datos_usuario])
 
 # Realizar la predicción
-if st.sidebar.button("Predecir"):
+if st.sidebar.button(":stethoscope: Predecir"):
     try:
         prediccion = modelo.predict(df_usuario)  # Usar el DataFrame para la predicción
         resultado = "Positivo (1)" if prediccion[0] == 1 else "Negativo (0)"
@@ -411,11 +411,11 @@ if st.sidebar.button("Predecir"):
 
 # Botón para descargar los resultados
 st.download_button(
-                label="Descargar resultados",
+                label="	:floppy_disk: Descargar resultados",
                 data=df_reporte.to_csv(index=False).encode('utf-8'),
                 file_name="resultados_prediccion.csv",
                 mime="text/csv"
             )   
 
 # Link archivo de análisis
-st.link_button("📥 Descargar Archivo desde GitHub", "https://github.com/MelRossi/App-Neuro-Tx-Latam/raw/main/An%C3%A1lisis_METS.ipynb")
+st.link_button(":page_facing_up: Descargar Archivo de Análisis", "https://github.com/MelRossi/App-Neuro-Tx-Latam/raw/main/An%C3%A1lisis_METS.ipynb")
