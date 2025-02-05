@@ -418,4 +418,4 @@ st.download_button(
             )   
 
 # Link archivo de análisis
-st.link_button(":page_facing_up: Descargar Archivo de Análisis", "https://github.com/MelRossi/App-Neuro-Tx-Latam/raw/main/An%C3%A1lisis_METS.ipynb")
+st.link_button(":page_facing_up: Descargar Archivo de Análisis", "https://github.com/MelRossi/Demo-App---Streamlit/blob/main/analisis%26modelos.pdf")
